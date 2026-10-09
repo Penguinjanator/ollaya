@@ -170,8 +170,13 @@ def main():
             if repo not in base_models:
                 base_models.append(repo)
         upstream = ", ".join("[%s@%s](https://huggingface.co/%s/tree/%s)" % (r, c[:7], r, c) for r, c in sources)
-        if gguf:  # the file the tag pulls, and a vision tag's projector from the same revision
-            upstream += " `%s`" % v["gguf"] + (" + `%s`" % v["mmproj"] if v.get("mmproj") else "")
+        if gguf:  # the file the tag pulls, and a vision tag's projector (from another repo: with its pin)
+            m = v.get("mmproj")
+            if isinstance(m, tuple):
+                m = "[%s@%s](https://huggingface.co/%s/tree/%s) `%s`" % (m[0], m[1][:7], m[0], m[1], m[2])
+            elif m:
+                m = "`%s`" % m
+            upstream += " `%s`" % v["gguf"] + (" + %s" % m if m else "")
             any_mmproj = any_mmproj or bool(v.get("mmproj"))
         rows.append("| `%s:%s` | %s | %s |" % (model, tag, upstream, ", ".join("`%s/%s`" % (tag, n) for n in names)))
     by = spec.get("author", "")

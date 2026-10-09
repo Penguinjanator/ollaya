@@ -63,6 +63,31 @@ class ProjectorPackaging(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     package.package_gguf(spec, tag + '-vision', {**variant, 'mmproj': 'mmproj.gguf'}, blobs)
 
+    def test_projector_from_another_repo(self):
+        # A fine-tune that keeps its base's projector points at the author's file, not a copy.
+        with tempfile.TemporaryDirectory() as root:
+            cfg = {'gguf': {'repo': 'tuner/model', 'revision': 'commit', 'path': 'model.gguf',
+                            'sha256': 'abc', 'quantization': 'Q8_0'},
+                   'layout': 'winnow-v1', 'llama': {'n_ctx': 8192}}
+            Path(root, 'decision.json').write_text(json.dumps(cfg))
+            Path(root, 'calibration.json').write_text('{"temperature": [1, 1, 1]}')
+            spec = {'model': 'tuned', 'family': 'winnow', 'license': 'Apache-2.0', 'license_text': 'license'}
+            variant = {'repo': 'tuner/model', 'commit': 'commit', 'gguf': 'model.gguf', 'export_dir': root,
+                       'parameter_size': '7.5B', 'languages': ['multilingual'], 'description': 'text',
+                       'mmproj': ('author/base', 'base-commit', 'gguf/mmproj.gguf')}
+
+            def upstream(media, repo, commit, path):
+                return {'mediaType': media, 'digest': 'sha256:abc', 'size': 123,
+                        'urls': [f'https://huggingface.co/{repo}/resolve/{commit}/{path}']}
+
+            with patch.object(package, 'REGISTRY', root), \
+                 patch.object(package, 'upstream', side_effect=upstream), \
+                 patch.object(package, 'hf_commit_date', return_value='2026-01-01'):
+                _, layers = package.package_gguf(spec, 'e4b-vision', variant, package.Blobs('https://ollaya.dev'))
+                self.assertEqual(layers[0]['urls'], ['https://huggingface.co/tuner/model/resolve/commit/model.gguf'])
+                self.assertEqual(layers[-1]['urls'],
+                                 ['https://huggingface.co/author/base/resolve/base-commit/gguf/mmproj.gguf'])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -113,7 +113,7 @@ It is configured with environment variables:
 | `OLLAYA_LOG` | `info` | Log levels; `debug` logs every request with its status and duration |
 | `OLLAYA_LOG_DIR` | unset | Log to `<dir>/server.log` instead of stderr (created if missing; appended, never rotated) |
 
-For the systemd service, change them with `sudo systemctl edit ollaya` and `Environment=` lines.
+For the systemd service, change them with `sudo systemctl edit ollaya` and `Environment=` lines. Updates keep that drop-in, but they rewrite `/etc/systemd/system/ollaya.service` itself, so a line added there is lost. The installer saves a copy of the old file and warns when that happens.
 
 ## ollaya pull
 

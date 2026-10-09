@@ -523,7 +523,25 @@ EOF
             $SUDO usermod -a -G ollaya "$user"
         fi
         status "Creating the ollaya systemd service"
-        systemd_unit | $SUDO tee /etc/systemd/system/ollaya.service >/dev/null
+        unit=/etc/systemd/system/ollaya.service
+        systemd_unit >"$TMP/ollaya.service"
+        # Every install rewrites the unit, `ollaya update` too, so a setting added to it is lost;
+        # drop-ins (ollaya.service.d) are never touched. When the unit has lines the new one does
+        # not, comments aside, keep a copy next to it and name the lines, with the values of keys,
+        # tokens and passwords masked.
+        if [ -f "$unit" ]; then
+            dropped=$(grep -v -e '^[[:space:]]*[#;]' -e '^[[:space:]]*$' "$unit" |
+                grep -vxF -f "$TMP/ollaya.service" || :)
+            if [ -n "$dropped" ]; then
+                saved=$unit.$(date +%Y%m%d-%H%M%S).bak
+                $SUDO cp -p "$unit" "$saved"
+                warn "$unit has settings this install replaces. The old file is saved as $saved; these lines are not in the new one:"
+                printf '%s\n' "$dropped" |
+                    sed -E 's/([A-Za-z0-9_]*(KEY|TOKEN|SECRET|PASSWORD)[A-Za-z0-9_]*=)[^" ]*/\1***/g; s/^/    /' >&2
+                warn "every install and ollaya update rewrites $unit. Keep settings in a drop-in, which they never touch: sudo systemctl edit ollaya"
+            fi
+        fi
+        $SUDO tee "$unit" <"$TMP/ollaya.service" >/dev/null
         $SUDO systemctl daemon-reload
         $SUDO systemctl enable ollaya >/dev/null
         $SUDO systemctl restart ollaya

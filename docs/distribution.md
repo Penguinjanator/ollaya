@@ -489,11 +489,15 @@ What it does:
    `/usr/share/ollaya` and membership in `render` and `video`. It adds you to the `ollaya` group,
    writes `/etc/systemd/system/ollaya.service`, enables it and restarts it. Then it waits up to 15 s
    for `GET /` to answer `Ollaya is running`. If any of those conditions is missing, it says why it
-   skipped the service.
+   skipped the service. The unit is rewritten on every install, `ollaya update` included. When the
+   old unit has lines the new one does not (comments aside), the script first copies it to
+   `ollaya.service.<date>-<time>.bak` next to it and warns with those lines, masking the values of
+   keys, tokens and passwords. Drop-ins in `ollaya.service.d` are never touched.
 8. **Prints next steps:** `ollaya run winnow:e4b` when it installed a GPU pack and the largest GPU has 10 GB or more, `ollaya run laya` otherwise.
 
 Models for the service live in `/usr/share/ollaya/.ollaya/models` (`OLLAYA_MODELS` in the unit). To
-change settings, run `sudo systemctl edit ollaya` and add `Environment=` lines.
+change settings, run `sudo systemctl edit ollaya` and add `Environment=` lines: the drop-in it
+writes outlives updates, while a line added to the unit itself does not.
 
 To uninstall:
 

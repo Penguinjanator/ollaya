@@ -1,0 +1,39 @@
+{
+  "scope": "CPU image runtime parity against stock llama-server b11146, external temperature 1; not vision quality/calibration evaluation",
+  "variants": [
+    {
+      "variant": "accuracy",
+      "device": "cpu",
+      "proof": "PASS: 21 requests, 65/65 decisions, max log-probability error 7.4305782e-06\n",
+      "projector_sha256": "ddf46c21d7078e95338cfc22306b19b276a29a5ad089023449dd54d4b6170a51"
+    },
+    {
+      "variant": "calibrated",
+      "device": "cpu",
+      "proof": "PASS: 21 requests, 65/65 decisions, max log-probability error 7.6244225e-06\n",
+      "projector_sha256": "ddf46c21d7078e95338cfc22306b19b276a29a5ad089023449dd54d4b6170a51"
+    }
+  ],
+  "fixtures_sha256": {
+    "accuracy": "6ce538311e2bc8890e9ae78cf312f3f877383ce69609e2e6a7700961c1c8e6b9",
+    "calibrated": "0b01d5ae86f70c2d4b7cf25dc4f7c71c3710511c709f7fd3f988ac10c5d90aaf"
+  },
+  "gate_max_logprob_error": 0.001,
+  "checks": [
+    "generated RGB PNG inputs",
+    "two-image ordering",
+    "repeat after other images",
+    "escaped state",
+    "noul/choice/score"
+  ],
+  "public_pull": {
+    "tags": [
+      "e4b-vision",
+      "e4b-calibrated-vision"
+    ],
+    "source": "Public pinned HF files, no token, initially empty store; registry metadata from stacked branch",
+    "projector_sha256": "ddf46c21d7078e95338cfc22306b19b276a29a5ad089023449dd54d4b6170a51",
+    "projector_bytes": 990372672,
+    "registry_metadata": "Local branch metadata; only unpublished ollaya.dev blob URLs remapped to local metadata server. HF URLs unchanged."
+  }
+}

@@ -182,6 +182,20 @@ const overlays: Record<string, ModelOverlay> = {
       '1.1': { summary: 'Von 1.1, ModernBERT-large, 0.447 on typed decisions; 8,192-token context.' },
     },
   },
+  credence: {
+    title: 'Credence',
+    description:
+      "Txoka's Credence v1: MiCA refinements of EldanRing's Winnow-E4B (Gemma 4), run from the author's Q8_0 GGUFs on llama.cpp. Two checkpoints trade public accuracy against calibration, each with a vision tag that adds Winnow-E4B's unchanged projector; neither beats original Winnow on every metric.",
+    publisher: { name: 'Txoka', url: 'https://huggingface.co/Txoka/Credence-v1-Gemma4-E4B' },
+    capabilities: ['decision', 'multilingual', 'fine-tuned', 'gguf'],
+    keywords: ['credence', 'txoka', 'mica', 'winnow', 'gemma', 'gemma 4', 'gguf', 'llama.cpp', 'calibration', 'vision', 'decision'],
+    rank: 20,
+    tags: {
+      latest: { summary: 'Same as credence:e4b.' },
+      e4b: { summary: 'Accuracy-focused Q8_0 checkpoint, external temperature 1: 72.35 % on typed decisions.' },
+      'e4b-calibrated': { summary: 'Separate zero-synthetic checkpoint with a validation-fitted temperature: stronger public calibration, 72.20 % on typed decisions.' },
+    },
+  },
   winnow: {
     stats: { tag: 'winnow:e4b', accuracy: 0.722, latencyMs: 89 },
     title: 'Winnow',

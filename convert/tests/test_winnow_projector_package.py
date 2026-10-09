@@ -11,6 +11,20 @@ from ollaya_convert import catalog, package
 
 
 class ProjectorPackaging(unittest.TestCase):
+    def test_credence_variants_share_the_verified_frozen_projector(self):
+        spec = catalog.CATALOG['credence']
+        release = json.loads((Path(__file__).resolve().parents[1] /
+                              'releases/credence-e4b.json').read_text())
+        projector = release['vision_projector']
+        for tag in ['e4b', 'e4b-calibrated']:
+            text, vision = spec['tags'][tag], spec['tags'][tag + '-vision']
+            for key in ['repo', 'commit', 'gguf', 'export_dir']:
+                self.assertEqual(text[key], vision[key])
+            self.assertNotIn('mmproj', text)
+            # Winnow-E4B's projector, from EldanRing's repo, not the copy in Txoka's.
+            self.assertEqual(vision['mmproj'], (projector['repo'], projector['revision'], projector['path']))
+            self.assertEqual(projector['repo'], 'EldanRing/Winnow-E4B')
+
     def test_catalog_projectors_match_their_text_sources(self):
         spec = catalog.CATALOG["winnow"]
         self.assertEqual(spec["aliases"]["latest"], "12b")

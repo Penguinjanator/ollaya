@@ -1,0 +1,9 @@
+{
+  "tags": [
+    "e4b",
+    "e4b-calibrated"
+  ],
+  "registry": "isolated localhost generated from branch catalog",
+  "weight_source": "public pinned HF, no token supplied, empty initial store",
+  "binary_sha256": "0ea8694e9d9db81c5bfcd884d694a50150329342628a4ba14440d58d0ecbf80a"
+}

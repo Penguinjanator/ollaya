@@ -1,0 +1,113 @@
+{
+  "run": "runs/eval/gguf/original-winnow-e4b-q8",
+  "subsets": 13,
+  "records": 3880,
+  "errors": 0,
+  "macro_accuracy": 0.7345665244673617,
+  "micro_accuracy": 0.7373711340206186,
+  "macro_ece10": 0.09930877373034426,
+  "pooled_ece10": 0.07089335037444663,
+  "mean_brier": 0.38021638484684156,
+  "median_ms": 70.92276148614474,
+  "p95_ms": 146.7140059976373,
+  "by_type": {
+    "choice": 0.77494691247636,
+    "noul": 0.8008129319955407,
+    "score": 0.556855198572066
+  },
+  "per_subset": {
+    "vitaminc-dev": {
+      "n": 599,
+      "errors": 0,
+      "accuracy": 0.6961602671118531,
+      "ece10": 0.17161624612914075,
+      "type": "choice"
+    },
+    "massive-en-US": {
+      "n": 350,
+      "errors": 0,
+      "accuracy": 0.8485714285714285,
+      "ece10": 0.02308582208818424,
+      "type": "choice"
+    },
+    "massive-de-DE": {
+      "n": 350,
+      "errors": 0,
+      "accuracy": 0.8085714285714286,
+      "ece10": 0.04672557310818688,
+      "type": "choice"
+    },
+    "boolq": {
+      "n": 300,
+      "errors": 0,
+      "accuracy": 0.82,
+      "ece10": 0.08654766666666666,
+      "type": "noul"
+    },
+    "squad2": {
+      "n": 299,
+      "errors": 0,
+      "accuracy": 0.8193979933110368,
+      "ece10": 0.04348963210702341,
+      "type": "noul"
+    },
+    "paws": {
+      "n": 250,
+      "errors": 0,
+      "accuracy": 0.808,
+      "ece10": 0.031090000000000003,
+      "type": "noul"
+    },
+    "multinli": {
+      "n": 299,
+      "errors": 0,
+      "accuracy": 0.8294314381270903,
+      "ece10": 0.05089097921812384,
+      "type": "choice"
+    },
+    "civil_comments": {
+      "n": 300,
+      "errors": 0,
+      "accuracy": 0.7566666666666667,
+      "ece10": 0.05078066666666667,
+      "type": "noul"
+    },
+    "aegis2": {
+      "n": 250,
+      "errors": 0,
+      "accuracy": 0.8,
+      "ece10": 0.08716399999999999,
+      "type": "noul"
+    },
+    "helpsteer2": {
+      "n": 249,
+      "errors": 0,
+      "accuracy": 0.37751004016064255,
+      "ece10": 0.3157109855923187,
+      "type": "score"
+    },
+    "summeval-relevance": {
+      "n": 240,
+      "errors": 0,
+      "accuracy": 0.44583333333333336,
+      "ece10": 0.058589037853993546,
+      "type": "score"
+    },
+    "summeval-consistency": {
+      "n": 144,
+      "errors": 0,
+      "accuracy": 0.8472222222222222,
+      "ece10": 0.2244431081850152,
+      "type": "score"
+    },
+    "pubmedqa": {
+      "n": 250,
+      "errors": 0,
+      "accuracy": 0.692,
+      "ece10": 0.10088034087915543,
+      "type": "choice"
+    }
+  },
+  "model": "Winnow-E4B \u00b7 original Q8_0 \u00b7 Ollaya",
+  "server": "local Ollaya Q8_0 CUDA"
+}

@@ -1,0 +1,163 @@
+{
+  "pull": {
+    "tags": [
+      "e4b",
+      "e4b-calibrated"
+    ],
+    "registry": "isolated localhost generated from branch catalog",
+    "weight_source": "public pinned HF, no token supplied, empty initial store",
+    "binary_sha256": "0ea8694e9d9db81c5bfcd884d694a50150329342628a4ba14440d58d0ecbf80a"
+  },
+  "parity": [
+    {
+      "variant": "accuracy",
+      "device": "cpu",
+      "goldens_sha256": "7b84ad479967873fcd512d9fd0991778750547caa11e4511db387037e6b53d7f",
+      "reference_meta": {
+        "server": "version: 0.5.0-dev (build 11146, commit 7fe450e19) built with GNU 13.3.0 for Linux x86_64",
+        "device": "cpu",
+        "args": [
+          "-c",
+          "8192",
+          "-np",
+          "1",
+          "--cache-ram",
+          "0",
+          "--ctx-checkpoints",
+          "0",
+          "-b",
+          "2048",
+          "-ub",
+          "512",
+          "--fit",
+          "off",
+          "--no-ui",
+          "--offline",
+          "--swa-full",
+          "-ngl",
+          "0",
+          "--device",
+          "none"
+        ],
+        "gguf_sha256": "c80a2320a02e79ed77a1b49b7e8a2f55a1ea1d295dbd791aebded6b68bb465e0",
+        "reference": "ollaya_convert.families.winnow.ref + llm_common.plan (the fixed evaluation plan)"
+      },
+      "parity_output": "loaded Q8_0 on cpu in 3.4s\n123 cases (15 rejected), 505 questions on cpu in 696.8s: decisions 505/505 (100.00%), option logits max 7.584e-6 p99 7.287e-6, probabilities max 1.744e-6 p99 1.550e-6\nPASS\n"
+    },
+    {
+      "variant": "calibrated",
+      "device": "cpu",
+      "goldens_sha256": "547bb59fd19cf0eb97bc7eba16b11f59a62f81cbfeb27aada318810b14d0f8e0",
+      "reference_meta": {
+        "server": "version: 0.5.0-dev (build 11146, commit 7fe450e19) built with GNU 13.3.0 for Linux x86_64",
+        "device": "cpu",
+        "args": [
+          "-c",
+          "8192",
+          "-np",
+          "1",
+          "--cache-ram",
+          "0",
+          "--ctx-checkpoints",
+          "0",
+          "-b",
+          "2048",
+          "-ub",
+          "512",
+          "--fit",
+          "off",
+          "--no-ui",
+          "--offline",
+          "--swa-full",
+          "-ngl",
+          "0",
+          "--device",
+          "none"
+        ],
+        "gguf_sha256": "7c557d65b7427007fe49d226c8e6b45e7ab59425a8c39747a28647e9440e7ed1",
+        "reference": "ollaya_convert.families.winnow.ref + llm_common.plan (the fixed evaluation plan)"
+      },
+      "parity_output": "loaded Q8_0 on cpu in 1.1s\n123 cases (15 rejected), 505 questions on cpu in 703.4s: decisions 505/505 (100.00%), option logits max 7.582e-6 p99 7.196e-6, probabilities max 1.784e-6 p99 1.350e-6\nPASS\n"
+    },
+    {
+      "variant": "accuracy",
+      "device": "cuda",
+      "goldens_sha256": "46a66344113b374f7628dc6ec0c38cc19194d9e84a4aa1a2414737e6420ac120",
+      "reference_meta": {
+        "server": "version: 0.5.0-dev (build 11146, commit 7fe450e19) built with GNU 13.3.0 for Linux x86_64",
+        "device": "CUDA0",
+        "args": [
+          "-c",
+          "8192",
+          "-np",
+          "1",
+          "--cache-ram",
+          "0",
+          "--ctx-checkpoints",
+          "0",
+          "-b",
+          "2048",
+          "-ub",
+          "512",
+          "--fit",
+          "off",
+          "--no-ui",
+          "--offline",
+          "--swa-full",
+          "-ngl",
+          "all",
+          "--device",
+          "CUDA0"
+        ],
+        "gguf_sha256": "c80a2320a02e79ed77a1b49b7e8a2f55a1ea1d295dbd791aebded6b68bb465e0",
+        "reference": "ollaya_convert.families.winnow.ref + llm_common.plan (the fixed evaluation plan)"
+      },
+      "parity_output": "loaded Q8_0 on cuda:0 in 1.5s\n123 cases (15 rejected), 505 questions on cuda:0 in 18.2s: decisions 505/505 (100.00%), option logits max 7.545e-6 p99 7.352e-6, probabilities max 1.870e-6 p99 1.616e-6\nPASS\n"
+    },
+    {
+      "variant": "calibrated",
+      "device": "cuda",
+      "goldens_sha256": "717a5d0c18defb1c5d987d2a2365af2ef61f4a15d7231afd09c019fd746dea42",
+      "reference_meta": {
+        "server": "version: 0.5.0-dev (build 11146, commit 7fe450e19) built with GNU 13.3.0 for Linux x86_64",
+        "device": "CUDA0",
+        "args": [
+          "-c",
+          "8192",
+          "-np",
+          "1",
+          "--cache-ram",
+          "0",
+          "--ctx-checkpoints",
+          "0",
+          "-b",
+          "2048",
+          "-ub",
+          "512",
+          "--fit",
+          "off",
+          "--no-ui",
+          "--offline",
+          "--swa-full",
+          "-ngl",
+          "all",
+          "--device",
+          "CUDA0"
+        ],
+        "gguf_sha256": "7c557d65b7427007fe49d226c8e6b45e7ab59425a8c39747a28647e9440e7ed1",
+        "reference": "ollaya_convert.families.winnow.ref + llm_common.plan (the fixed evaluation plan)"
+      },
+      "parity_output": "loaded Q8_0 on cuda:0 in 1.5s\n123 cases (15 rejected), 505 questions on cuda:0 in 18.5s: decisions 505/505 (100.00%), option logits max 7.592e-6 p99 7.198e-6, probabilities max 1.816e-6 p99 1.507e-6\nPASS\n"
+    }
+  ],
+  "tolerance_log_softmax": 0.001,
+  "parity_binary_sha256": "7b2a26cd050c672243a3a199417a6580e15dba073dd1226533c8f6669bf0918f",
+  "rust_checks": "91 decision tests, 10 registry unit tests, 4 localhost registry integration tests passed",
+  "packaging_checks": "2 upstream packaging regression tests passed",
+  "platform": "Linux x86_64; CPU and RTX4070 CUDA; llama.cpp b11146",
+  "unsupported_claims": [
+    "No Metal/Windows parity",
+    "No image support",
+    "No comparable leaderboard GPU latency"
+  ]
+}

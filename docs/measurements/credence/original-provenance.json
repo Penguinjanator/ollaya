@@ -1,0 +1,37 @@
+{
+  "model": "Winnow-E4B \u00b7 original Q8_0 \u00b7 Ollaya",
+  "ollaya_model": "winnow:e4b",
+  "precision": "GGUF Q8_0",
+  "runtime": "Ollaya 0.8.0 / llama.cpp b11146 CUDA canonical prefix",
+  "benchmark": {
+    "subsets": [
+      "vitaminc-dev",
+      "massive-en-US",
+      "massive-de-DE",
+      "boolq",
+      "squad2",
+      "paws",
+      "multinli",
+      "civil_comments",
+      "aegis2",
+      "helpsteer2",
+      "summeval-relevance",
+      "summeval-consistency",
+      "pubmedqa"
+    ],
+    "complete": true,
+    "typed_sha256": "e6b149efbae9d91b111f20d18fca3ed0e7df2043497f8364f03d9310e3f1c796",
+    "provenance": {
+      "ollaya_revision": "929a0491f18d2f5105941c65e723e0a28c308556",
+      "nimble_revision": "62076b4f2d365b5879dafcf7f6dd072a1fe76df7",
+      "results_url": "https://ollaya.dev/results",
+      "snapshot_date": "2026-10-03",
+      "evaluation_only": true
+    }
+  },
+  "external_temperature": 1.2574172017327816,
+  "latency_comparable_to_site": false,
+  "typed_probability_precision": "4 decimal wire probabilities; clamped1e-12 for logs",
+  "export": null,
+  "evaluation_code_sha256": "9e15ecaa0d6ae406f15ea50a45f7b7c1f86163a41fcd0aaa56df79639ff3312c"
+}

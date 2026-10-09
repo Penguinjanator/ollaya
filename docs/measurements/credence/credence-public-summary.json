@@ -1,0 +1,113 @@
+{
+  "run": "/home/txoka/Desktop/winnow-rlcd/runs/eval/gguf/synth05-hardreal2-clip-25-s002500-T1calibrated",
+  "subsets": 13,
+  "records": 3880,
+  "errors": 0,
+  "macro_accuracy": 0.741244249803827,
+  "micro_accuracy": 0.7430412371134021,
+  "macro_ece10": 0.09505042288219019,
+  "pooled_ece10": 0.05478886770075736,
+  "mean_brier": 0.372402877480731,
+  "median_ms": 62.118918998748995,
+  "p95_ms": 137.13208402623422,
+  "by_type": {
+    "choice": 0.7726108904233605,
+    "noul": 0.8101730211817169,
+    "score": 0.5740852298081214
+  },
+  "per_subset": {
+    "vitaminc-dev": {
+      "n": 599,
+      "errors": 0,
+      "accuracy": 0.6911519198664441,
+      "ece10": 0.1586270212388345,
+      "type": "choice"
+    },
+    "massive-en-US": {
+      "n": 350,
+      "errors": 0,
+      "accuracy": 0.8657142857142858,
+      "ece10": 0.03423690132795005,
+      "type": "choice"
+    },
+    "massive-de-DE": {
+      "n": 350,
+      "errors": 0,
+      "accuracy": 0.8228571428571428,
+      "ece10": 0.04017627963027595,
+      "type": "choice"
+    },
+    "boolq": {
+      "n": 300,
+      "errors": 0,
+      "accuracy": 0.8133333333333334,
+      "ece10": 0.11568633333333334,
+      "type": "noul"
+    },
+    "squad2": {
+      "n": 299,
+      "errors": 0,
+      "accuracy": 0.8595317725752508,
+      "ece10": 0.03067926421404682,
+      "type": "noul"
+    },
+    "paws": {
+      "n": 250,
+      "errors": 0,
+      "accuracy": 0.792,
+      "ece10": 0.0338928,
+      "type": "noul"
+    },
+    "multinli": {
+      "n": 299,
+      "errors": 0,
+      "accuracy": 0.7993311036789298,
+      "ece10": 0.027733531913796853,
+      "type": "choice"
+    },
+    "civil_comments": {
+      "n": 300,
+      "errors": 0,
+      "accuracy": 0.77,
+      "ece10": 0.045169,
+      "type": "noul"
+    },
+    "aegis2": {
+      "n": 250,
+      "errors": 0,
+      "accuracy": 0.816,
+      "ece10": 0.0924892,
+      "type": "noul"
+    },
+    "helpsteer2": {
+      "n": 249,
+      "errors": 0,
+      "accuracy": 0.36947791164658633,
+      "ece10": 0.2436226621732429,
+      "type": "score"
+    },
+    "summeval-relevance": {
+      "n": 240,
+      "errors": 0,
+      "accuracy": 0.49166666666666664,
+      "ece10": 0.05517648782900658,
+      "type": "score"
+    },
+    "summeval-consistency": {
+      "n": 144,
+      "errors": 0,
+      "accuracy": 0.8611111111111112,
+      "ece10": 0.2557002036857034,
+      "type": "score"
+    },
+    "pubmedqa": {
+      "n": 250,
+      "errors": 0,
+      "accuracy": 0.684,
+      "ece10": 0.10246581212228212,
+      "type": "choice"
+    }
+  },
+  "model": "Winnow \u00b7 r32 \u00b7 clip25 \u00b7 synth05 \u00b7 +QASC+ContractNLI+DynaHate \u00b7 s002500 \u00b7 calibrated T1 \u00b7 Q8_0 Ollaya T1",
+  "server": "local Ollaya Q8_0 CUDA"
+}

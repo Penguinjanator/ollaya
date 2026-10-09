@@ -430,6 +430,44 @@ CATALOG = {
                   "are within 4.4e-4 and probabilities within 4.7e-5 on x86-64 CPU and CUDA; on Apple silicon's CPU "
                   "one of the 653 rows is 1.1e-3 off, and every decision is still the same.",
     },
+    "credence": {
+        "namespace": "library",
+        "model": "credence",
+        "family": "winnow",
+        "author": "Txoka",
+        "license": "Apache-2.0",
+        "license_text": "Credence v1 by Txoka, a MiCA refinement of EldanRing's Winnow-E4B "
+                        "on Google DeepMind's Gemma 4 E4B. Preserve upstream notices and "
+                        "individual training-data attribution.\n\n" + LICENSE_APACHE,
+        "tags": {
+            "e4b": _gguf("winnow-credence-e4b", "Txoka/Credence-v1-Gemma4-E4B",
+                         "7d5ffc84145f34a3a76f7074e8c70bf1c1efce56", "accuracy/model-Q8_0.gguf",
+                         "Credence v1 Gemma4 E4B, Q8_0, accuracy-focused MiCA checkpoint; folded calibration, "
+                         "external temperature 1. Typed calibration is worse than original Winnow.",
+                         "7.5B", ["multilingual"], notice="accuracy/NOTICE"),
+            "e4b-calibrated": _gguf("winnow-credence-e4b-calibrated", "Txoka/Credence-v1-Gemma4-E4B",
+                         "7d5ffc84145f34a3a76f7074e8c70bf1c1efce56", "calibrated/model-Q8_0.gguf",
+                         "Credence v1 Gemma4 E4B, Q8_0, separate zero-synthetic checkpoint with "
+                         "validation-fitted temperature; stronger public calibration, lower public accuracy.",
+                         "7.5B", ["multilingual"], notice="calibrated/NOTICE"),
+            "e4b-vision": dict(_gguf("winnow-credence-e4b", "Txoka/Credence-v1-Gemma4-E4B",
+                         "7d5ffc84145f34a3a76f7074e8c70bf1c1efce56", "accuracy/model-Q8_0.gguf",
+                         "Credence v1 Gemma4 E4B accuracy-focused, Q8_0 with Winnow-E4B's unchanged vision projector: PNG image decisions through libmtmd.",
+                         "7.5B", ["multilingual"], notice="accuracy/NOTICE"),
+                         mmproj=("EldanRing/Winnow-E4B", "734302fe5fbfeb3f21a7ece62653c9539be4aaf3",
+                                 "gguf/mmproj-Winnow-E4B.gguf")),
+            "e4b-calibrated-vision": dict(_gguf("winnow-credence-e4b-calibrated", "Txoka/Credence-v1-Gemma4-E4B",
+                         "7d5ffc84145f34a3a76f7074e8c70bf1c1efce56", "calibrated/model-Q8_0.gguf",
+                         "Credence v1 Gemma4 E4B validation-calibrated, Q8_0 with Winnow-E4B's unchanged vision projector: PNG image decisions through libmtmd.",
+                         "7.5B", ["multilingual"], notice="calibrated/NOTICE"),
+                         mmproj=("EldanRing/Winnow-E4B", "734302fe5fbfeb3f21a7ece62653c9539be4aaf3",
+                                 "gguf/mmproj-Winnow-E4B.gguf")),
+        },
+        "aliases": {"latest": "e4b"},
+        "parity": "Ollaya's runner matches stock llama-server of the pinned build (b11146) on the same GGUF and the "
+                  "same device: 505/505 decisions for both checkpoints, option logits within 7.6e-6, on the x86-64 CPU "
+                  "and an RTX 4070 (the contributor) and an RTX 4090 (Ollaya); the vision tags also match it on images.",
+    },
     "winnow": {
         "namespace": "library",
         "model": "winnow",

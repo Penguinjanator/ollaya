@@ -1,0 +1,66 @@
+{
+  "rows": 400,
+  "questions": 2000,
+  "temperature": 1.0,
+  "as_evaluated": {
+    "choice": {
+      "n": 600,
+      "acc": 0.7,
+      "soft_ce": 1.1779,
+      "nll": 0.7468,
+      "ece": 0.0621
+    },
+    "score": {
+      "n": 800,
+      "acc": 0.6887,
+      "soft_ce": 1.2101,
+      "nll": 0.8275,
+      "ece": 0.0795
+    },
+    "noul": {
+      "n": 600,
+      "acc": 0.7883,
+      "soft_ce": 0.702,
+      "nll": 0.4869,
+      "ece": 0.0807
+    },
+    "all": {
+      "n": 2000,
+      "acc": 0.722,
+      "soft_ce": 1.048,
+      "nll": 0.7011,
+      "ece": 0.0463
+    }
+  },
+  "raw_T1": {
+    "choice": {
+      "n": 600,
+      "acc": 0.7,
+      "soft_ce": 1.1779,
+      "nll": 0.7468,
+      "ece": 0.0621
+    },
+    "score": {
+      "n": 800,
+      "acc": 0.6887,
+      "soft_ce": 1.2101,
+      "nll": 0.8275,
+      "ece": 0.0795
+    },
+    "noul": {
+      "n": 600,
+      "acc": 0.7883,
+      "soft_ce": 0.702,
+      "nll": 0.4869,
+      "ece": 0.0807
+    },
+    "all": {
+      "n": 2000,
+      "acc": 0.722,
+      "soft_ce": 1.048,
+      "nll": 0.7011,
+      "ece": 0.0463
+    }
+  },
+  "note": "Log probabilities reconstructed from Ollaya rounded wire probabilities; original model uses published calibration internally; exported checkpoints use folded scale with external T1. No temperature fitted on test."
+}

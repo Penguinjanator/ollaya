@@ -1,0 +1,84 @@
+{
+  "name": "credence:e4b",
+  "family": "winnow",
+  "layout": "winnow-v1",
+  "checkpoint": "synth05-hardreal2-clip-25-s002500-T1calibrated",
+  "quantization": "Q8_0",
+  "gguf_sha256": "c80a2320a02e79ed77a1b49b7e8a2f55a1ea1d295dbd791aebded6b68bb465e0",
+  "gguf_bytes": 8718469216,
+  "adapter_sha256": "fc622e9f574badd930da77a288ed5752ea52a035f9541269b8232875cd893ce3",
+  "external_temperature": 1.0,
+  "license": "Apache-2.0",
+  "source_publication": {
+    "status": "published",
+    "repo": "Txoka/Credence-v1-Gemma4-E4B",
+    "revision": "7d5ffc84145f34a3a76f7074e8c70bf1c1efce56",
+    "path": "accuracy/model-Q8_0.gguf"
+  },
+  "benchmark_artifacts": {
+    "calibrated-provenance.json": "8fa505e6cc4a55c4652472cd033e411cecd96cdc5409f772573b5bd8f91b325a",
+    "calibrated-public-summary.json": "4b71f2f9e1845b6c1ebc3b462f3d25b3b8b70067c08607b4121347528b87b0c3",
+    "calibrated-typed-summary.json": "d6d560b934829dfbd1b665bc8b43cf3385b329e15f903107f17b207b1cc312ec",
+    "credence-provenance.json": "77c2b9b6ed98a610734b308762889b60e86aff88f3be8f0797f44b95ea87d1c4",
+    "credence-public-summary.json": "14287c3876c77d079bfc722100f3471470ae761cb0a5607c8cc8d9ed467e1171",
+    "credence-typed-summary.json": "d9f496c8a26dfc28b8527f628833fa15f5f76643fefd85b9963f1a10574aa539",
+    "original-provenance.json": "1689560091a7116d42bd06a30ecc67368cbaadbe1b3d1b09605e697cf989d3fa",
+    "original-public-summary.json": "80fd8424c233b78f47dfe76e34895cd559ec0f4c83bfa6bd74c460249dbd9855",
+    "original-typed-summary.json": "aea700291c8d8e9d22b187415ed66b3e4d7a00400abb895815f6b04100ccbe51"
+  },
+  "calibrated_variant": {
+    "name": "credence:e4b-calibrated",
+    "checkpoint": "synth00-hardreal2-clip-25-s002500-T1calibrated",
+    "gguf_sha256": "7c557d65b7427007fe49d226c8e6b45e7ab59425a8c39747a28647e9440e7ed1",
+    "adapter_sha256": "789bbdacdc6d65fa6455f67db618dd1acf25b5c726316f9feeb3e30cf204b797",
+    "external_temperature": [
+      1.0408574437121012,
+      1.0408574437121012,
+      1.0408574437121012
+    ],
+    "source_publication": {
+      "status": "published",
+      "repo": "Txoka/Credence-v1-Gemma4-E4B",
+      "revision": "7d5ffc84145f34a3a76f7074e8c70bf1c1efce56",
+      "path": "calibrated/model-Q8_0.gguf"
+    },
+    "validation_calibration": {
+      "schema": 1,
+      "model": "rlcd-synth00-hardreal2-clip-25-s002500-t1calibrated:latest",
+      "residual_temperature": 1.0408574437121012,
+      "objective": "mean soft cross entropy, one global temperature for all question types",
+      "validation_questions": 1024,
+      "validation_sha256": "a53f7b3135ddf838e47e41a7bab43f36f5853428c1be97978ed0806053ebbf97",
+      "validation_manifest": {
+        "eligible_validation_questions": 906530,
+        "selected": 1024,
+        "split": "validation",
+        "selection": "fixed hash-ranked within source, alternating real/synthetic, balanced source rotation",
+        "sha256": "a53f7b3135ddf838e47e41a7bab43f36f5853428c1be97978ed0806053ebbf97",
+        "corpus_sha256": "99431e53c3ef4766403ae6f716f7f802b4ec4d96fef6c64a2f8b3e4748e667fa",
+        "benchmark_overlap": "excluded exact state and VitaminC family via same training validation selector",
+        "note": "Same fixed1024 training-validation questions, halfreal/halfsynthetic sourcebalanced. Previously used for checkpoint monitoring, so not an untouched finaltest."
+      },
+      "validation_ce_before": 0.5771714579327996,
+      "validation_ce_after": 0.5769467370845168,
+      "on_search_boundary": false,
+      "wire_precision": "fit from Ollaya4decimal probabilities; zero clamp1e-12",
+      "benchmark_used_for_fitting": false
+    }
+  },
+  "vision_projector": {
+    "repo": "EldanRing/Winnow-E4B",
+    "revision": "734302fe5fbfeb3f21a7ece62653c9539be4aaf3",
+    "path": "gguf/mmproj-Winnow-E4B.gguf",
+    "sha256": "ddf46c21d7078e95338cfc22306b19b276a29a5ad089023449dd54d4b6170a51",
+    "bytes": 990372672,
+    "credence_copy": {
+      "repo": "Txoka/Credence-v1-Gemma4-E4B",
+      "revision": "7d5ffc84145f34a3a76f7074e8c70bf1c1efce56",
+      "path": "vision/mmproj-Gemma4-E4B-F16.gguf"
+    },
+    "base_model": "google/gemma-4-E4B-it",
+    "base_revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+    "training": "Publisher states vision/audio modules remained frozen; reuse byte-identical F16 artifact."
+  }
+}

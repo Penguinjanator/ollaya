@@ -84,6 +84,7 @@ numbers: [ollaya.dev/search](https://ollaya.dev/search).
 | Model | What it is |
 |---|---|
 | `winnow:e4b` | **Recommended.** EldanRing's Winnow-E4B, a Gemma 4 fine-tune run from the author's Q8_0 GGUF on llama.cpp: 0.722 on typed-decisions (Jev: 0.738), 89 ms for five questions on an RTX 4090 |
+| `credence:e4b`, `credence:e4b-calibrated` | Txoka's MiCA refinements of Winnow-E4B, Q8_0: accuracy-focused and public-calibration variants; see the measured tradeoffs in the family documentation |
 | `laya` | Router: picks `laya:en` or `laya:multilingual` by language |
 | `laya:en` | English decision model (ModernBERT-large, 421M). The fastest: 8–10 ms for five questions on an RTX 4090 |
 | `laya:multilingual` | 100+ languages (mmBERT-base, 322M) |

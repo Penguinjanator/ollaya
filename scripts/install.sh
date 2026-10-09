@@ -530,7 +530,8 @@ EOF
         # not, comments aside, keep a copy next to it and name the lines, with the values of keys,
         # tokens and passwords masked.
         if [ -f "$unit" ]; then
-            dropped=$(grep -v -e '^[[:space:]]*[#;]' -e '^[[:space:]]*$' "$unit" |
+            # Read through $SUDO: a unit that holds a key may be readable by root only.
+            dropped=$($SUDO cat "$unit" | grep -v -e '^[[:space:]]*[#;]' -e '^[[:space:]]*$' |
                 grep -vxF -f "$TMP/ollaya.service" || :)
             if [ -n "$dropped" ]; then
                 saved=$unit.$(date +%Y%m%d-%H%M%S).bak

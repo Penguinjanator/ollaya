@@ -104,7 +104,8 @@ async fn falls_back_to_a_single_stream_when_the_server_ignores_range() {
 #[tokio::test]
 async fn retries_a_408_timeout_and_completes() {
     // A mirror (or proxy) that answers one 408 Request Timeout before serving the blob must not
-    // fail the pull: 408 is transient, so the single-stream path retries with backoff.
+    // fail the pull: 408 is transient, so the request is retried with backoff. Here that is the
+    // range request, whose 200 then falls back to a single stream.
     let weights = Arc::new(pseudo_random(40 << 20)); // above the single-stream limit
     let remote = tempfile::tempdir().unwrap();
     let app = {

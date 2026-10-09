@@ -201,8 +201,8 @@ def main():
         raise SystemExit("%s: the catalog's parity text is still a placeholder" % model)
     if gguf:
         card = GGUF_CARD.format(**common, mmproj_note=(
-            " A vision tag also pulls the authors' vision projector from the same revision, which reads the "
-            "images." if any_mmproj else ""))
+            " A vision tag also pulls the vision projector the table names, unmodified from its author's "
+            "repository, which reads the images." if any_mmproj else ""))
     else:
         card = CARD.format(**common, graphs_note=(
             "Each tag has an fp32 graph (CPU) and an fp16 graph (GPU)." if any_fp16

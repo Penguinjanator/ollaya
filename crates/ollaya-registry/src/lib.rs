@@ -24,6 +24,11 @@ pub enum Error {
     Stalled(String),
     #[error("corrupt data: {0}")]
     Corrupt(String),
+    /// The server answered a byte-range request with `200` instead of `206`, so it cannot serve
+    /// parallel ranges (some mirrors, e.g. Artifactory's `/resolve/`, ignore `Range` and return
+    /// the whole body). Large blobs fall back to a single stream.
+    #[error("{0}: server does not support byte ranges")]
+    NoRanges(String),
     /// This client cannot run the model; found from its config, before any layer downloads.
     #[error("{0}")]
     Unsupported(String),
@@ -49,6 +54,7 @@ impl Error {
                 e.is_timeout()
                     || e.is_connect()
                     || e.is_body()
+                    || e.status() == Some(reqwest::StatusCode::REQUEST_TIMEOUT)
                     || e.status().is_some_and(|s| s.is_server_error())
             }
             _ => false,

@@ -1,0 +1,6 @@
+# Model pages keep the colon in their URL: /models/winnow:e4b is served from models/winnow/e4b.html
+# with status 200 (Cloudflare's asset server would otherwise 307 it to /models/winnow%3Ae4b).
+/models/:model:* /models/:model/:splat 200
+
+# Badges live at /badge/<model>/<tag>.svg; /badge/<model>:<tag>.svg serves the same file.
+/badge/:model:* /badge/:model/:splat 200

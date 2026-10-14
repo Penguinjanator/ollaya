@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://ollaya.dev">Website</a> ·
   <a href="https://ollaya.dev/search">Models</a> ·
-  <a href="https://ollaya.dev/results">Results</a> ·
+  <a href="https://bench.ollaya.dev">Bench</a> ·
   <a href="https://ollaya.dev/docs">Docs</a> ·
   <a href="https://github.com/ollaya-dev/ollaya/releases">Releases</a> ·
   <a href="https://huggingface.co/ollaya-dev">Hugging Face</a>
@@ -120,25 +120,25 @@ compares the two projects.
 
 ## Results
 
-We measure every model on our own GPUs and CPUs and publish all of it, with the raw data, at
-[ollaya.dev/results](https://ollaya.dev/results): accuracy and calibration on public benchmarks,
-speed on every machine, and parity with the authors' own code on each device.
+Every model in the library is measured on our own machines and published, with the raw data, on
+[Ollaya Bench](https://bench.ollaya.dev): one released runtime, each author's own weights, the same
+5,880 questions for every model (Bespoke Labs' 13 public subsets and typed-decisions), and speed and
+memory on a GPU and a CPU. Edition 2026.10 ran Ollaya 0.13.0 on an RTX 5090 desktop:
 
-<p align="center">
-  <a href="https://ollaya.dev/results"><img src="https://ollaya.dev/data/results/accuracy-speed.svg" alt="Accuracy against latency on Bespoke Labs' public benchmark, RTX 5090: Ollaya's models and Ollama's" width="760"></a>
-</p>
-
-- **Accuracy.** On Bespoke Labs' public benchmark (3,880 human-labeled questions from 13 datasets,
-  scored with Bespoke's own code, one RTX 5090), `winnow:12b` scores 0.773 at 60 ms per question.
-  Ollama's best, Nimble, scores 0.749 at 210 ms.
-- **Calibration.** On the same Nimble weights, the calibration error is 0.022 on Ollaya and 0.122
-  on Ollama: Ollaya applies each model's fitted temperature.
-- **Speed.** Every model on an RTX 5090, an RTX 4090 and two CPUs (Threadripper 3960X,
-  i9-13900K), five questions per request through the HTTP API. The encoders (`laya`, `nli`,
-  `gliclass`, `von`, `qwen3guard`, `decima`) take 7 to 35 ms on a GPU and 0.15 to 2.4 s on a CPU; the decoders
-  0.1 to 0.9 s on a GPU and 1.3 to 25 s on a CPU; `nimble:9b` 1.8 to 2.3 s on a GPU.
+- **Score.** Chance-corrected accuracy over 14 tasks, with 95 % intervals: `jeb:27b` 67.8 (scored
+  without typed-decisions, which it was trained on), `winnow:12b` 65.7, `clef:flash` 65.1,
+  `cygnet:12b` 64.6 and `d1:3b` 63.1, which answers five questions in 51 ms on the RTX 5090.
+- **Calibration.** The lowest calibration errors on the public benchmark are 0.022 (`nimble:9b`,
+  `laya:typed-decisions`), 0.024 (`jeb:27b`) and 0.025 (`clef:flash`).
+- **Speed and memory.** Five-question requests through the HTTP API: the encoders take 13 to 30 ms
+  on the RTX 5090 and 0.5 to 2.6 s on its Threadripper 3960X; the decoders 51 ms to 1.7 s on the GPU
+  and 1.7 to 62 s on the CPU. Every model's VRAM and RAM are on its page.
 - **Parity.** Before a model ships, its runtime is checked question by question against the
   authors' code (or llama.cpp's own server, for GGUF models) on each device it runs on.
+
+Earlier runs, the comparison with Ollama on the same GPU (on the same Nimble weights the
+calibration error is 0.022 on Ollaya and 0.122 on Ollama) and the Windows, CUDA and Vulkan
+measurements are at [ollaya.dev/results](https://ollaya.dev/results).
 
 <p align="center">
   <a href="https://ollaya.dev/results#speed"><img src="https://ollaya.dev/data/results/speed.svg" alt="Median latency of five-question requests for every model on each GPU and CPU we measured" width="760"></a>

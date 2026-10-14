@@ -9,6 +9,7 @@
 import type { Child } from 'hono/jsx'
 import { Bars, DotPlot, Figure, Heatmap, Responsive, Scatter, toneVar, type DotSeries, type SeriesKey, type Tone } from '../components/charts'
 import { textLink } from '../components/ui'
+import { benchUrl } from '../lib/bench'
 import {
   latencyRuns,
   latencySeries,
@@ -558,6 +559,14 @@ export function ResultsPage() {
           and whether it gives the same answers as its authors' code. All numbers, with the raw data.
         </p>
         {newest ? <p class="mt-4 text-sm text-muted">Newest measurement: {newest.slice(0, 10)}</p> : null}
+        <p class="mt-6 max-w-2xl rounded-xl border border-line bg-subtle px-4 py-3 text-sm text-body">
+          Every model in the library, measured again on Ollaya's newest release with a score, intervals, memory and a page per
+          model:{' '}
+          <a href={benchUrl()} class="font-medium text-fg underline underline-offset-4">
+            Ollaya Bench
+          </a>
+          . This page keeps the earlier runs, the comparison with Ollama and the CUDA, Vulkan and parity measurements.
+        </p>
         <div class="mt-10">
           <Overview />
         </div>

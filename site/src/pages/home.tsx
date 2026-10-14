@@ -1,5 +1,6 @@
 import type { Child } from 'hono/jsx'
 import { Icon, type IconName } from '../components/Icon'
+import { benchUrl } from '../lib/bench'
 import { LogoMark } from '../components/Logo'
 import { Legend } from '../components/charts'
 import { btnPrimary, Code, CodeBlock, textLink } from '../components/ui'
@@ -525,8 +526,8 @@ function VersusOllama() {
         llama.cpp, Ollaya in fp32 with the author's temperature.
       </p>
       <p class="mt-4">
-        <a href="/results" class="inline-flex items-center gap-1.5 text-sm font-medium text-fg underline-offset-4 hover:underline">
-          All results, every machine, with the raw data <Icon name="arrowRight" class="size-4" />
+        <a href={benchUrl()} class="inline-flex items-center gap-1.5 text-sm font-medium text-fg underline-offset-4 hover:underline">
+          Every model on Ollaya Bench, with the raw data <Icon name="arrowRight" class="size-4" />
         </a>
       </p>
     </Section>

@@ -1,9 +1,10 @@
+import { benchUrl } from '../lib/bench'
 import { AUTHOR, COPYRIGHT_YEAR, GITHUB_URL, HF_URL } from '../site'
 
 // Six links: two even rows of three on a phone, one row from sm up.
 const links = [
   { href: '/search', label: 'Models' },
-  { href: '/results', label: 'Results' },
+  { href: '', label: 'Bench' },
   { href: '/docs', label: 'Docs' },
   { href: '/download', label: 'Download' },
   { href: GITHUB_URL, label: 'GitHub' },
@@ -25,7 +26,7 @@ export function Footer() {
           <ul class="grid grid-cols-3 gap-x-4 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
             {links.map((l) => (
               <li>
-                <a href={l.href} class="underline-offset-4 hover:text-fg hover:underline">
+                <a href={l.label === 'Bench' ? benchUrl() : l.href} class="underline-offset-4 hover:text-fg hover:underline">
                   {l.label}
                 </a>
               </li>

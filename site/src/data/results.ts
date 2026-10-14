@@ -112,8 +112,11 @@ export const publicRuns = runs.filter((r): r is PublicRun => r.suite === 'public
 export const latencyRuns = runs.filter((r): r is LatencyRun => r.suite === 'latency-triage')
 export const parityRuns = runs.filter((r): r is ParityRun => r.suite === 'parity')
 
-/** The newest public-benchmark run. */
-export const publicBench: PublicRun | undefined = publicRuns.at(-1)
+/**
+ * The newest public-benchmark run with Ollama on the same GPU: the comparison this page and the
+ * README's chart draw. Ollaya Bench editions (the bench site) measure Ollaya alone.
+ */
+export const publicBench: PublicRun | undefined = publicRuns.filter((r) => 'ollama' in r.servers).at(-1)
 
 /**
  * The name a run's model goes by on the page: without a registry host (`127.0.0.1:18742/library/

@@ -1,6 +1,8 @@
 // Renders the social preview cards (1200×630 PNG) into public/static/:
 //   og.png           every page without its own card
 //   og/<model>.png   a model's pages (/library/<model>, its tags)
+// and into bench-public/static/:
+//   og-bench.png     every page of bench.ollaya.dev
 //
 // The PNGs are committed, so the site build does not need a browser. Run this by hand after
 // changing a card or adding a model:
@@ -109,7 +111,7 @@ function page(body) {
 </style></head><body><div class="card"><div class="glow"></div><div class="grid"></div>${body}</div></body></html>`
 }
 
-const top = (url) => `<div class="top"><div class="brand">${OWL}<span>ollaya</span></div><div class="url">${esc(url)}</div></div>`
+const top = (url, name = 'ollaya') => `<div class="top"><div class="brand">${OWL}<span>${name}</span></div><div class="url">${esc(url)}</div></div>`
 const command = (model) => `<div class="cmd"><span class="p">❯</span> <span class="c">ollaya</span> run ${esc(model)}</div>`
 
 /** The results card's numbers, from the newest public-benchmark run in ../results (as on /results). */
@@ -132,6 +134,14 @@ function resultsCard() {
 }
 
 const cards = [
+  {
+    file: 'og-bench.png',
+    dir: join(root, 'bench-public', 'static'),
+    html: page(`${top('bench.ollaya.dev', 'ollaya <span style="color:#8a8a8a">bench</span>')}
+      <div class="main"><span class="badge">Accuracy · calibration · speed · memory</span>
+      <h1 style="margin-top:22px">Every open decision model, measured on real hardware.</h1>
+      <p class="text">One released runtime, the authors' own weights, the same 5,880 questions, and GPUs and CPUs people own. Every number with its raw data.</p></div>`),
+  },
   { file: 'og/results.png', html: resultsCard() },
   {
     file: 'og.png',
@@ -171,7 +181,7 @@ try {
   for (const card of cards.filter((c) => !only.length || only.includes(c.file))) {
     const html = join(tmp, card.file.replace('/', '-') + '.html')
     await writeFile(html, card.html)
-    const target = join(out, card.file)
+    const target = join(card.dir ?? out, card.file)
     const r = spawnSync(bin, [
       '--no-sandbox',
       '--hide-scrollbars',

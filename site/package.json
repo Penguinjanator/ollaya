@@ -11,9 +11,12 @@
   "scripts": {
     "gen": "node scripts/gen-content.mjs && node scripts/gen-registry.mjs && node scripts/gen-results.mjs",
     "typecheck": "npm run gen && tsc --noEmit",
-    "build": "npm run typecheck && node scripts/build.mjs && node scripts/check.mjs",
+    "build": "npm run typecheck && node scripts/build.mjs && node scripts/check.mjs && node scripts/build-bench.mjs",
+    "build:bench": "npm run gen && node scripts/build-bench.mjs",
     "dev": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "dev:bench": "npm run build:bench && wrangler dev -c wrangler.bench.jsonc",
+    "deploy:bench": "npm run build:bench && wrangler deploy -c wrangler.bench.jsonc"
   },
   "devDependencies": {
     "@tailwindcss/cli": "4.3.3",

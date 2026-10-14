@@ -19,6 +19,7 @@ import { Layout, type PageMeta } from './components/Layout'
 import { catalog, fullName, searchIndex } from './data/catalog'
 import { docPages } from './generated/content'
 import { hasAsset, setAssetVersions } from './lib/assets'
+import { setBenchOrigin } from './lib/bench'
 import { setGithubStars } from './lib/stars'
 import { DocsIndex, DocView, withOrigin } from './pages/docs'
 import { DownloadPage } from './pages/download'
@@ -34,6 +35,8 @@ import { SearchPage } from './pages/search'
 export interface BuildOptions {
   /** Public origin without trailing slash, e.g. from the SITE_ORIGIN env var. */
   origin: string
+  /** Ollaya Bench's origin (BENCH_ORIGIN), which the header and footer link to. */
+  bench: string
   /** Content hashes of files in dist/static (for ?v= cache busting). */
   assetVersions: Record<string, string>
   /** The GitHub repository's stars at build time, shown in the header; undefined offline. */
@@ -153,8 +156,9 @@ async function toHtml(node: Child): Promise<string> {
   return `<!DOCTYPE html>${await (await (node as Promise<string> | string)).toString()}`
 }
 
-export async function renderSite({ origin, assetVersions, stars }: BuildOptions): Promise<OutputFile[]> {
+export async function renderSite({ origin, bench, assetVersions, stars }: BuildOptions): Promise<OutputFile[]> {
   setAssetVersions(assetVersions)
+  setBenchOrigin(bench)
   setGithubStars(stars)
   const out: OutputFile[] = []
   const all = pages(origin)

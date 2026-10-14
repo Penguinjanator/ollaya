@@ -1,3 +1,4 @@
+import { benchUrl } from '../lib/bench'
 import { githubStars } from '../lib/stars'
 import { GITHUB_URL } from '../site'
 import { Icon } from './Icon'
@@ -7,7 +8,8 @@ export type NavKey = 'models' | 'results' | 'docs' | 'download'
 
 const links: { key: NavKey | 'github'; href: string; label: string }[] = [
   { key: 'models', href: '/search', label: 'Models' },
-  { key: 'results', href: '/results', label: 'Results' },
+  // Ollaya Bench, on its own host: the href is set at render time (benchUrl needs the build's origin).
+  { key: 'results', href: '', label: 'Bench' },
   { key: 'docs', href: '/docs', label: 'Docs' },
   { key: 'github', href: GITHUB_URL, label: 'GitHub' },
 ]
@@ -111,7 +113,7 @@ function MobileMenu() {
         <ul class="mt-8 flex flex-col gap-1 text-2xl font-medium text-fg">
           {links.map((l) => (
             <li>
-              <a href={l.href} class="block py-2 hover:underline underline-offset-4">
+              <a href={l.key === 'results' ? benchUrl() : l.href} class="block py-2 hover:underline underline-offset-4">
                 {l.key === 'github' ? <GithubLabel label={l.label} /> : l.label}
               </a>
             </li>
@@ -139,7 +141,7 @@ export function Header({ active, hideSearch }: { active?: NavKey; hideSearch?: b
             {links.map((l) => (
               <li class={l.key === 'github' ? 'lg:hidden' : undefined}>
                 <a
-                  href={l.href}
+                  href={l.key === 'results' ? benchUrl() : l.href}
                   class={`underline-offset-4 hover:text-fg hover:underline ${active === l.key ? 'font-medium text-fg' : 'text-body'}`}
                   aria-current={active === l.key ? 'page' : undefined}
                 >

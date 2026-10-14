@@ -61,7 +61,7 @@ for (const token of ['--color-canvas', '--color-fg', 'prefers-color-scheme:dark'
 
 // 3. Hard-coded hosts in sources -------------------------------------------------------------------
 const hostPattern = /ollaya\.(cobanov\.)?dev/i
-for (const dir of ['src', 'docs', 'content', 'public']) {
+for (const dir of ['src', 'docs', 'content', 'public', 'bench-public']) {
   for (const file of await walk(join(root, dir))) {
     // src/generated/registry.ts mirrors the registry's manifests, whose blob URLs build.mjs checks against SITE_ORIGIN.
     if (/\.(png|ico|woff2?)$/.test(file) || file.includes(`${sep}generated${sep}`)) continue

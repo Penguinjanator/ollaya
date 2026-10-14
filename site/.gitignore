@@ -4,3 +4,5 @@ dist/
 # generated from docs/ and content/ by scripts/gen-content.mjs
 src/generated/
 .dist-tmp/
+dist-bench/
+.dist-bench-tmp/

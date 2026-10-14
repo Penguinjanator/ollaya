@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Ollaya Bench (bench.ollaya.dev): a fully static site like ollaya.dev, served by Workers Static Assets
+  // with no Worker script, so it stays on the free plan. `npm run build:bench` writes ./dist-bench.
+  "name": "ollaya-bench",
+  "compatibility_date": "2026-09-15",
+  "assets": {
+    "directory": "./dist-bench",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  // The zone ollaya.dev is in the same Cloudflare account; Wrangler creates the DNS record and certificate.
+  "routes": [{ "pattern": "bench.ollaya.dev", "custom_domain": true }],
+  "workers_dev": true,
+  "preview_urls": false
+}

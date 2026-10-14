@@ -19,6 +19,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { build } from 'esbuild'
 
 const DEFAULT_ORIGIN = 'https://ollaya.dev'
+const DEFAULT_BENCH_ORIGIN = 'https://bench.ollaya.dev'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const finalDist = join(root, 'dist')
@@ -115,7 +116,8 @@ await build({
   logLevel: 'warning',
 })
 const { renderSite } = await import(`${pathToFileURL(bundle).href}?t=${Date.now()}`)
-const files = await renderSite({ origin, assetVersions, stars: await githubStars() })
+const bench = resolveOrigin(process.env.BENCH_ORIGIN?.trim() || DEFAULT_BENCH_ORIGIN)
+const files = await renderSite({ origin, bench, assetVersions, stars: await githubStars() })
 
 for (const f of files) {
   const target = join(dist, f.path)

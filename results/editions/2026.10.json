@@ -1,0 +1,955 @@
+{
+ "schema": 1,
+ "id": "2026.10",
+ "title": "Ollaya Bench 2026.10",
+ "date": "2026-10-14",
+ "ollaya": "0.13.0",
+ "machine": "rtx-5090",
+ "runs": [
+  "2026-10-14-latency-rtx5090-cuda.json",
+  "2026-10-14-latency-rtx5090-cpu.json",
+  "2026-10-14-public-benchmark-rtx5090-cuda.json",
+  "2026-10-14-typed-decisions-rtx5090-cuda.json"
+ ],
+ "models": [
+  "decima:small",
+  "decima:base",
+  "decima:agent",
+  "laya:en",
+  "laya:multilingual",
+  "laya:typed-decisions",
+  "laya",
+  "nli:deberta-v3-large",
+  "nli:modernbert-large",
+  "gliclass:large",
+  "von:1.1",
+  "qwen3guard:0.6b",
+  "snap:2b",
+  "snap:2b-q4_k_m",
+  "d1:3b",
+  "winnow:e4b",
+  "credence:e4b",
+  "credence:e4b-calibrated",
+  "jevk5:4b",
+  "decider:0.8b",
+  "decider:2b",
+  "decider:4b",
+  "decision:eos",
+  "kev:0.8b",
+  "kev:4b",
+  "kev:9b",
+  "arbiter:4b",
+  "winnow:12b",
+  "cygnet:12b",
+  "clm:8b",
+  "jeb:4b",
+  "jeb:9b",
+  "clef:flash",
+  "jeeves:9b",
+  "nimble:9b",
+  "jeb:27b"
+ ],
+ "score": {
+  "definition": "Mean over 14 tasks (13 public subsets and typed-decisions, equal weight) of the chance-corrected accuracy 100 * (accuracy - chance) / (1 - chance); chance is the mean of 1/K over the task's questions. A model trained on a task's train split is scored on the other tasks",
+  "interval": "95 % bootstrap, 1000 draws, seed 20261014; questions resampled within each subset, typed-decisions states whole",
+  "results": [
+   {
+    "model": "jeb:27b",
+    "score": 67.85,
+    "score_ci": [
+     65.76,
+     69.85
+    ],
+    "tasks": {
+     "vitaminc-dev": 72.2,
+     "massive-en-US": 86.99,
+     "massive-de-DE": 86.08,
+     "boolq": 78.0,
+     "squad2": 52.51,
+     "paws": 65.6,
+     "multinli": 87.46,
+     "civil_comments": 70.0,
+     "aegis2": 57.6,
+     "helpsteer2": 32.23,
+     "summeval-relevance": 45.83,
+     "summeval-consistency": 83.51,
+     "pubmedqa": 64.0,
+     "typed-decisions": 71.06
+    },
+    "trained_on": [
+     "typed-decisions"
+    ]
+   },
+   {
+    "model": "winnow:12b",
+    "score": 65.67,
+    "score_ci": [
+     63.69,
+     67.55
+    ],
+    "tasks": {
+     "vitaminc-dev": 63.19,
+     "massive-en-US": 85.78,
+     "massive-de-DE": 84.27,
+     "boolq": 74.67,
+     "squad2": 75.25,
+     "paws": 66.4,
+     "multinli": 72.41,
+     "civil_comments": 74.0,
+     "aegis2": 63.2,
+     "helpsteer2": 25.7,
+     "summeval-relevance": 36.98,
+     "summeval-consistency": 84.38,
+     "pubmedqa": 56.8,
+     "typed-decisions": 56.34
+    },
+    "trained_on": []
+   },
+   {
+    "model": "clef:flash",
+    "score": 65.14,
+    "score_ci": [
+     63.24,
+     67.0
+    ],
+    "tasks": {
+     "vitaminc-dev": 65.19,
+     "massive-en-US": 90.32,
+     "massive-de-DE": 89.71,
+     "boolq": 71.33,
+     "squad2": 64.55,
+     "paws": 62.4,
+     "multinli": 73.41,
+     "civil_comments": 80.0,
+     "aegis2": 57.6,
+     "helpsteer2": 22.69,
+     "summeval-relevance": 34.37,
+     "summeval-consistency": 77.43,
+     "pubmedqa": 66.4,
+     "typed-decisions": 56.48
+    },
+    "trained_on": []
+   },
+   {
+    "model": "jeb:9b",
+    "score": 64.9,
+    "score_ci": [
+     62.62,
+     66.98
+    ],
+    "tasks": {
+     "vitaminc-dev": 63.19,
+     "massive-en-US": 84.27,
+     "massive-de-DE": 83.66,
+     "boolq": 71.33,
+     "squad2": 59.87,
+     "paws": 65.6,
+     "multinli": 76.92,
+     "civil_comments": 72.0,
+     "aegis2": 56.8,
+     "helpsteer2": 29.22,
+     "summeval-relevance": 36.98,
+     "summeval-consistency": 85.24,
+     "pubmedqa": 58.6,
+     "typed-decisions": 68.72
+    },
+    "trained_on": [
+     "typed-decisions"
+    ]
+   },
+   {
+    "model": "cygnet:12b",
+    "score": 64.56,
+    "score_ci": [
+     62.64,
+     66.47
+    ],
+    "tasks": {
+     "vitaminc-dev": 62.19,
+     "massive-en-US": 84.87,
+     "massive-de-DE": 86.39,
+     "boolq": 73.33,
+     "squad2": 72.58,
+     "paws": 66.4,
+     "multinli": 74.92,
+     "civil_comments": 63.33,
+     "aegis2": 63.2,
+     "helpsteer2": 26.71,
+     "summeval-relevance": 31.77,
+     "summeval-consistency": 83.51,
+     "pubmedqa": 61.0,
+     "typed-decisions": 53.7
+    },
+    "trained_on": []
+   },
+   {
+    "model": "jeb:4b",
+    "score": 63.86,
+    "score_ci": [
+     61.56,
+     65.9
+    ],
+    "tasks": {
+     "vitaminc-dev": 63.94,
+     "massive-en-US": 84.87,
+     "massive-de-DE": 82.15,
+     "boolq": 70.0,
+     "squad2": 52.51,
+     "paws": 66.4,
+     "multinli": 81.44,
+     "civil_comments": 74.0,
+     "aegis2": 58.4,
+     "helpsteer2": 24.2,
+     "summeval-relevance": 39.06,
+     "summeval-consistency": 80.03,
+     "pubmedqa": 53.2,
+     "typed-decisions": 70.62
+    },
+    "trained_on": [
+     "typed-decisions"
+    ]
+   },
+   {
+    "model": "d1:3b",
+    "score": 63.13,
+    "score_ci": [
+     61.43,
+     64.97
+    ],
+    "tasks": {
+     "vitaminc-dev": 52.42,
+     "massive-en-US": 85.18,
+     "massive-de-DE": 83.36,
+     "boolq": 70.0,
+     "squad2": 77.93,
+     "paws": 80.8,
+     "multinli": 76.42,
+     "civil_comments": 82.0,
+     "aegis2": 64.8,
+     "helpsteer2": 30.22,
+     "summeval-relevance": -5.73,
+     "summeval-consistency": 79.17,
+     "pubmedqa": 58.6,
+     "typed-decisions": 48.72
+    },
+    "trained_on": []
+   },
+   {
+    "model": "decider:4b",
+    "score": 62.87,
+    "score_ci": [
+     61.01,
+     64.86
+    ],
+    "tasks": {
+     "vitaminc-dev": 61.19,
+     "massive-en-US": 85.48,
+     "massive-de-DE": 83.36,
+     "boolq": 73.33,
+     "squad2": 57.86,
+     "paws": 53.6,
+     "multinli": 89.46,
+     "civil_comments": 74.67,
+     "aegis2": 60.8,
+     "helpsteer2": 31.22,
+     "summeval-relevance": 22.4,
+     "summeval-consistency": 77.43,
+     "pubmedqa": 56.2,
+     "typed-decisions": 53.11
+    },
+    "trained_on": []
+   },
+   {
+    "model": "kev:9b",
+    "score": 62.56,
+    "score_ci": [
+     60.63,
+     64.55
+    ],
+    "tasks": {
+     "vitaminc-dev": 60.18,
+     "massive-en-US": 83.66,
+     "massive-de-DE": 82.76,
+     "boolq": 69.33,
+     "squad2": 48.49,
+     "paws": 60.8,
+     "multinli": 85.95,
+     "civil_comments": 68.67,
+     "aegis2": 60.0,
+     "helpsteer2": 23.19,
+     "summeval-relevance": 32.81,
+     "summeval-consistency": 77.43,
+     "pubmedqa": 63.4,
+     "typed-decisions": 59.19
+    },
+    "trained_on": []
+   },
+   {
+    "model": "nimble:9b",
+    "score": 61.86,
+    "score_ci": [
+     59.91,
+     63.81
+    ],
+    "tasks": {
+     "vitaminc-dev": 65.19,
+     "massive-en-US": 83.06,
+     "massive-de-DE": 79.73,
+     "boolq": 70.67,
+     "squad2": 64.55,
+     "paws": 60.0,
+     "multinli": 73.91,
+     "civil_comments": 68.67,
+     "aegis2": 62.4,
+     "helpsteer2": 17.67,
+     "summeval-relevance": 25.0,
+     "summeval-consistency": 80.9,
+     "pubmedqa": 63.4,
+     "typed-decisions": 50.92
+    },
+    "trained_on": []
+   },
+   {
+    "model": "kev:4b",
+    "score": 61.21,
+    "score_ci": [
+     59.19,
+     63.21
+    ],
+    "tasks": {
+     "vitaminc-dev": 58.18,
+     "massive-en-US": 85.48,
+     "massive-de-DE": 85.18,
+     "boolq": 70.67,
+     "squad2": 56.52,
+     "paws": 63.2,
+     "multinli": 87.46,
+     "civil_comments": 63.33,
+     "aegis2": 62.4,
+     "helpsteer2": 17.67,
+     "summeval-relevance": 21.35,
+     "summeval-consistency": 76.56,
+     "pubmedqa": 57.4,
+     "typed-decisions": 51.5
+    },
+    "trained_on": []
+   },
+   {
+    "model": "jeeves:9b",
+    "score": 61.11,
+    "score_ci": [
+     59.09,
+     62.96
+    ],
+    "tasks": {
+     "vitaminc-dev": 44.91,
+     "massive-en-US": 85.78,
+     "massive-de-DE": 84.27,
+     "boolq": 74.0,
+     "squad2": 65.89,
+     "paws": 64.0,
+     "multinli": 87.96,
+     "civil_comments": 58.0,
+     "aegis2": 54.4,
+     "helpsteer2": 20.18,
+     "summeval-relevance": 25.52,
+     "summeval-consistency": 80.03,
+     "pubmedqa": 57.4,
+     "typed-decisions": 53.19
+    },
+    "trained_on": []
+   },
+   {
+    "model": "credence:e4b",
+    "score": 60.99,
+    "score_ci": [
+     58.97,
+     62.79
+    ],
+    "tasks": {
+     "vitaminc-dev": 52.92,
+     "massive-en-US": 85.78,
+     "massive-de-DE": 81.55,
+     "boolq": 62.67,
+     "squad2": 71.91,
+     "paws": 58.4,
+     "multinli": 70.9,
+     "civil_comments": 54.0,
+     "aegis2": 64.0,
+     "helpsteer2": 21.18,
+     "summeval-relevance": 35.94,
+     "summeval-consistency": 81.77,
+     "pubmedqa": 53.2,
+     "typed-decisions": 59.71
+    },
+    "trained_on": []
+   },
+   {
+    "model": "credence:e4b-calibrated",
+    "score": 60.46,
+    "score_ci": [
+     58.59,
+     62.41
+    ],
+    "tasks": {
+     "vitaminc-dev": 52.92,
+     "massive-en-US": 85.18,
+     "massive-de-DE": 79.43,
+     "boolq": 62.0,
+     "squad2": 66.56,
+     "paws": 59.2,
+     "multinli": 69.4,
+     "civil_comments": 60.0,
+     "aegis2": 62.4,
+     "helpsteer2": 23.19,
+     "summeval-relevance": 32.81,
+     "summeval-consistency": 80.03,
+     "pubmedqa": 53.8,
+     "typed-decisions": 59.49
+    },
+    "trained_on": []
+   },
+   {
+    "model": "winnow:e4b",
+    "score": 59.93,
+    "score_ci": [
+     57.89,
+     61.94
+    ],
+    "tasks": {
+     "vitaminc-dev": 54.42,
+     "massive-en-US": 84.27,
+     "massive-de-DE": 79.73,
+     "boolq": 63.33,
+     "squad2": 63.21,
+     "paws": 61.6,
+     "multinli": 74.92,
+     "civil_comments": 50.67,
+     "aegis2": 59.2,
+     "helpsteer2": 22.19,
+     "summeval-relevance": 31.25,
+     "summeval-consistency": 80.9,
+     "pubmedqa": 53.8,
+     "typed-decisions": 59.56
+    },
+    "trained_on": []
+   },
+   {
+    "model": "snap:2b",
+    "score": 55.75,
+    "score_ci": [
+     53.79,
+     57.66
+    ],
+    "tasks": {
+     "vitaminc-dev": 58.68,
+     "massive-en-US": 76.4,
+     "massive-de-DE": 67.63,
+     "boolq": 58.67,
+     "squad2": 52.51,
+     "paws": 77.6,
+     "multinli": 65.38,
+     "civil_comments": 78.0,
+     "aegis2": 47.2,
+     "helpsteer2": 21.69,
+     "summeval-relevance": 14.06,
+     "summeval-consistency": 79.17,
+     "pubmedqa": 35.2,
+     "typed-decisions": 48.35
+    },
+    "trained_on": []
+   },
+   {
+    "model": "snap:2b-q4_k_m",
+    "score": 54.35,
+    "score_ci": [
+     52.28,
+     56.41
+    ],
+    "tasks": {
+     "vitaminc-dev": 57.68,
+     "massive-en-US": 74.29,
+     "massive-de-DE": 64.0,
+     "boolq": 54.67,
+     "squad2": 59.2,
+     "paws": 72.8,
+     "multinli": 69.4,
+     "civil_comments": 78.0,
+     "aegis2": 40.8,
+     "helpsteer2": 20.68,
+     "summeval-relevance": 18.75,
+     "summeval-consistency": 73.09,
+     "pubmedqa": 28.0,
+     "typed-decisions": 49.52
+    },
+    "trained_on": []
+   },
+   {
+    "model": "decider:2b",
+    "score": 54.34,
+    "score_ci": [
+     52.15,
+     56.2
+    ],
+    "tasks": {
+     "vitaminc-dev": 45.41,
+     "massive-en-US": 80.94,
+     "massive-de-DE": 78.22,
+     "boolq": 60.67,
+     "squad2": 56.52,
+     "paws": 44.0,
+     "multinli": 78.43,
+     "civil_comments": 68.0,
+     "aegis2": 44.0,
+     "helpsteer2": 28.21,
+     "summeval-relevance": 18.75,
+     "summeval-consistency": 58.33,
+     "pubmedqa": 59.2,
+     "typed-decisions": 40.07
+    },
+    "trained_on": []
+   },
+   {
+    "model": "jevk5:4b",
+    "score": 48.6,
+    "score_ci": [
+     46.6,
+     50.69
+    ],
+    "tasks": {
+     "vitaminc-dev": 52.42,
+     "massive-en-US": -5.88,
+     "massive-de-DE": -5.88,
+     "boolq": 69.33,
+     "squad2": 59.87,
+     "paws": 61.6,
+     "multinli": 76.42,
+     "civil_comments": 66.67,
+     "aegis2": 60.0,
+     "helpsteer2": 27.21,
+     "summeval-relevance": 29.69,
+     "summeval-consistency": 81.77,
+     "pubmedqa": 61.6,
+     "typed-decisions": 45.64
+    },
+    "trained_on": []
+   },
+   {
+    "model": "decider:0.8b",
+    "score": 47.82,
+    "score_ci": [
+     45.72,
+     49.98
+    ],
+    "tasks": {
+     "vitaminc-dev": 51.67,
+     "massive-en-US": 80.64,
+     "massive-de-DE": 77.01,
+     "boolq": 58.67,
+     "squad2": 44.48,
+     "paws": 18.4,
+     "multinli": 73.41,
+     "civil_comments": 74.0,
+     "aegis2": 23.2,
+     "helpsteer2": 24.7,
+     "summeval-relevance": -7.81,
+     "summeval-consistency": 80.03,
+     "pubmedqa": 43.6,
+     "typed-decisions": 27.55
+    },
+    "trained_on": []
+   },
+   {
+    "model": "kev:0.8b",
+    "score": 40.75,
+    "score_ci": [
+     38.68,
+     42.94
+    ],
+    "tasks": {
+     "vitaminc-dev": 49.42,
+     "massive-en-US": 73.38,
+     "massive-de-DE": 64.0,
+     "boolq": 58.67,
+     "squad2": 32.44,
+     "paws": 32.0,
+     "multinli": 69.9,
+     "civil_comments": 67.33,
+     "aegis2": 38.4,
+     "helpsteer2": 11.14,
+     "summeval-relevance": -7.81,
+     "summeval-consistency": 43.58,
+     "pubmedqa": 17.2,
+     "typed-decisions": 20.81
+    },
+    "trained_on": []
+   },
+   {
+    "model": "laya:typed-decisions",
+    "score": 40.26,
+    "score_ci": [
+     37.78,
+     42.63
+    ],
+    "tasks": {
+     "vitaminc-dev": 67.45,
+     "massive-en-US": 63.7,
+     "massive-de-DE": 33.75,
+     "boolq": 64.67,
+     "squad2": 39.8,
+     "paws": 8.0,
+     "multinli": 80.43,
+     "civil_comments": 85.33,
+     "aegis2": -0.8,
+     "helpsteer2": 19.18,
+     "summeval-relevance": 3.65,
+     "summeval-consistency": 31.42,
+     "pubmedqa": 26.8,
+     "typed-decisions": 65.86
+    },
+    "trained_on": [
+     "typed-decisions"
+    ]
+   },
+   {
+    "model": "decision:eos",
+    "score": 38.08,
+    "score_ci": [
+     35.82,
+     40.21
+    ],
+    "tasks": {
+     "vitaminc-dev": 43.66,
+     "massive-en-US": 80.64,
+     "massive-de-DE": 73.98,
+     "boolq": 36.67,
+     "squad2": 74.58,
+     "paws": 34.4,
+     "multinli": 65.38,
+     "civil_comments": 30.67,
+     "aegis2": 37.6,
+     "helpsteer2": 7.13,
+     "summeval-relevance": 2.6,
+     "summeval-consistency": 11.46,
+     "pubmedqa": 5.8,
+     "typed-decisions": 28.57
+    },
+    "trained_on": []
+   },
+   {
+    "model": "laya:multilingual",
+    "score": 36.74,
+    "score_ci": [
+     34.66,
+     38.94
+    ],
+    "tasks": {
+     "vitaminc-dev": 64.44,
+     "massive-en-US": 60.07,
+     "massive-de-DE": 41.01,
+     "boolq": 50.67,
+     "squad2": 20.4,
+     "paws": 53.6,
+     "multinli": 76.92,
+     "civil_comments": 84.0,
+     "aegis2": 20.0,
+     "helpsteer2": 7.63,
+     "summeval-relevance": -9.38,
+     "summeval-consistency": 12.33,
+     "pubmedqa": 28.0,
+     "typed-decisions": 4.62
+    },
+    "trained_on": []
+   },
+   {
+    "model": "decima:base",
+    "score": 31.04,
+    "score_ci": [
+     28.88,
+     33.22
+    ],
+    "tasks": {
+     "vitaminc-dev": 52.67,
+     "massive-en-US": 81.55,
+     "massive-de-DE": 79.43,
+     "boolq": 30.67,
+     "squad2": 17.06,
+     "paws": 23.2,
+     "multinli": 78.43,
+     "civil_comments": 60.67,
+     "aegis2": -7.2,
+     "helpsteer2": -3.41,
+     "summeval-relevance": -5.73,
+     "summeval-consistency": -15.45,
+     "pubmedqa": 18.4,
+     "typed-decisions": 24.32
+    },
+    "trained_on": []
+   },
+   {
+    "model": "laya",
+    "score": 30.41,
+    "score_ci": [
+     28.35,
+     32.41
+    ],
+    "tasks": {
+     "vitaminc-dev": 68.45,
+     "massive-en-US": 66.72,
+     "massive-de-DE": 40.71,
+     "boolq": 67.33,
+     "squad2": 23.75,
+     "paws": 16.0,
+     "multinli": 81.44,
+     "civil_comments": 87.33,
+     "aegis2": -14.4,
+     "helpsteer2": -5.42,
+     "summeval-relevance": -17.19,
+     "summeval-consistency": -19.79,
+     "pubmedqa": 25.0,
+     "typed-decisions": 5.86
+    },
+    "trained_on": []
+   },
+   {
+    "model": "laya:en",
+    "score": 30.12,
+    "score_ci": [
+     28.16,
+     31.99
+    ],
+    "tasks": {
+     "vitaminc-dev": 68.45,
+     "massive-en-US": 66.72,
+     "massive-de-DE": 37.38,
+     "boolq": 67.33,
+     "squad2": 23.75,
+     "paws": 15.2,
+     "multinli": 81.44,
+     "civil_comments": 87.33,
+     "aegis2": -14.4,
+     "helpsteer2": -5.42,
+     "summeval-relevance": -17.19,
+     "summeval-consistency": -19.79,
+     "pubmedqa": 25.0,
+     "typed-decisions": 5.86
+    },
+    "trained_on": []
+   },
+   {
+    "model": "decima:agent",
+    "score": 27.87,
+    "score_ci": [
+     25.69,
+     29.87
+    ],
+    "tasks": {
+     "vitaminc-dev": 44.66,
+     "massive-en-US": 82.76,
+     "massive-de-DE": 79.43,
+     "boolq": 20.0,
+     "squad2": 14.38,
+     "paws": 2.4,
+     "multinli": 66.89,
+     "civil_comments": 53.33,
+     "aegis2": 16.8,
+     "helpsteer2": -3.92,
+     "summeval-relevance": 6.77,
+     "summeval-consistency": -18.92,
+     "pubmedqa": 4.6,
+     "typed-decisions": 20.95
+    },
+    "trained_on": []
+   },
+   {
+    "model": "von:1.1",
+    "score": 23.7,
+    "score_ci": [
+     21.52,
+     26.01
+    ],
+    "tasks": {
+     "vitaminc-dev": 64.19,
+     "massive-en-US": 67.33,
+     "massive-de-DE": 22.25,
+     "boolq": 43.33,
+     "squad2": 0.33,
+     "paws": 15.2,
+     "multinli": -0.84,
+     "civil_comments": 52.0,
+     "aegis2": 25.6,
+     "helpsteer2": -6.93,
+     "summeval-relevance": 14.58,
+     "summeval-consistency": -14.58,
+     "pubmedqa": 30.4,
+     "typed-decisions": 18.9
+    },
+    "trained_on": []
+   },
+   {
+    "model": "nli:deberta-v3-large",
+    "score": 20.98,
+    "score_ci": [
+     19.01,
+     23.07
+    ],
+    "tasks": {
+     "vitaminc-dev": -10.93,
+     "massive-en-US": 57.65,
+     "massive-de-DE": 51.9,
+     "boolq": 49.33,
+     "squad2": -5.02,
+     "paws": 19.2,
+     "multinli": -2.84,
+     "civil_comments": 78.0,
+     "aegis2": 22.4,
+     "helpsteer2": -3.92,
+     "summeval-relevance": 3.12,
+     "summeval-consistency": -21.53,
+     "pubmedqa": 24.4,
+     "typed-decisions": 32.01
+    },
+    "trained_on": []
+   },
+   {
+    "model": "decima:small",
+    "score": 17.22,
+    "score_ci": [
+     15.22,
+     19.43
+    ],
+    "tasks": {
+     "vitaminc-dev": 35.89,
+     "massive-en-US": 79.43,
+     "massive-de-DE": 69.75,
+     "boolq": -5.33,
+     "squad2": -11.71,
+     "paws": 3.2,
+     "multinli": 57.86,
+     "civil_comments": 73.33,
+     "aegis2": -18.4,
+     "helpsteer2": -13.45,
+     "summeval-relevance": -17.19,
+     "summeval-consistency": -15.45,
+     "pubmedqa": -11.0,
+     "typed-decisions": 14.21
+    },
+    "trained_on": []
+   },
+   {
+    "model": "nli:modernbert-large",
+    "score": 17.07,
+    "score_ci": [
+     14.87,
+     19.15
+    ],
+    "tasks": {
+     "vitaminc-dev": 36.89,
+     "massive-en-US": 34.66,
+     "massive-de-DE": 20.13,
+     "boolq": 38.67,
+     "squad2": -6.35,
+     "paws": 8.8,
+     "multinli": 16.72,
+     "civil_comments": 76.0,
+     "aegis2": 15.2,
+     "helpsteer2": -1.41,
+     "summeval-relevance": -9.9,
+     "summeval-consistency": -19.79,
+     "pubmedqa": 0.4,
+     "typed-decisions": 29.01
+    },
+    "trained_on": []
+   },
+   {
+    "model": "gliclass:large",
+    "score": 15.34,
+    "score_ci": [
+     13.14,
+     17.56
+    ],
+    "tasks": {
+     "vitaminc-dev": -31.97,
+     "massive-en-US": 54.92,
+     "massive-de-DE": 46.45,
+     "boolq": 16.0,
+     "squad2": 1.0,
+     "paws": 8.8,
+     "multinli": -1.34,
+     "civil_comments": 60.67,
+     "aegis2": 13.6,
+     "helpsteer2": 8.13,
+     "summeval-relevance": 32.29,
+     "summeval-consistency": -14.58,
+     "pubmedqa": -2.6,
+     "typed-decisions": 23.37
+    },
+    "trained_on": []
+   },
+   {
+    "model": "arbiter:4b",
+    "score": 15.21,
+    "score_ci": [
+     13.23,
+     17.07
+    ],
+    "tasks": {
+     "vitaminc-dev": 41.65,
+     "massive-en-US": -5.88,
+     "massive-de-DE": -5.88,
+     "boolq": 59.33,
+     "squad2": 49.83,
+     "paws": 44.8,
+     "multinli": 58.86,
+     "civil_comments": 17.33,
+     "aegis2": 39.2,
+     "helpsteer2": -25.0,
+     "summeval-relevance": -25.0,
+     "summeval-consistency": -25.0,
+     "pubmedqa": 35.2,
+     "typed-decisions": -46.52
+    },
+    "trained_on": []
+   },
+   {
+    "model": "clm:8b",
+    "score": 9.28,
+    "score_ci": [
+     7.09,
+     11.31
+    ],
+    "tasks": {
+     "vitaminc-dev": 8.1,
+     "massive-en-US": 2.59,
+     "massive-de-DE": 0.47,
+     "boolq": 12.67,
+     "squad2": 4.35,
+     "paws": 3.2,
+     "multinli": 49.83,
+     "civil_comments": 68.67,
+     "aegis2": -15.2,
+     "helpsteer2": -0.9,
+     "summeval-relevance": 3.65,
+     "summeval-consistency": -23.26,
+     "pubmedqa": 10.0,
+     "typed-decisions": 5.79
+    },
+    "trained_on": []
+   }
+  ]
+ },
+ "trained_on": {
+  "laya:typed-decisions": [
+   "typed-decisions"
+  ],
+  "jeb:4b": [
+   "typed-decisions"
+  ],
+  "jeb:9b": [
+   "typed-decisions"
+  ],
+  "jeb:27b": [
+   "typed-decisions"
+  ]
+ }
+}

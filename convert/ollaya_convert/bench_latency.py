@@ -14,6 +14,12 @@ Every request carries a different message (STATES, in turn), as a client's traff
 model that caches by text (clm keeps every projection) answers a repeated request from its cache,
 which would time the cache rather than the model.
 
+With `--memory` (Linux, the server on the same machine) each result also has the memory the model takes:
+`vram_mb`, the rise of the GPU's used memory over the idle level just before the load, at its highest
+while the model is loaded (`nvidia-smi`, sampled every 100 ms; nothing else should use the GPU meanwhile),
+and `ram_peak_mb` / `ram_mb`, the runner process's peak and final resident memory (`VmHWM` and `VmRSS`).
+`size_mb` is the server's own estimate from `/api/ps`.
+
 Standard library only, so it runs on Windows, macOS and a bare Linux box without the convert
 environment. The output is one JSON file in the format of `results/README.md`.
 """
@@ -26,6 +32,7 @@ import os
 import platform
 import statistics
 import subprocess
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -66,6 +73,24 @@ STATES = [
 ]
 STATE = STATES[0]
 
+# The triage preset with its score question on six levels, for a model whose head takes no other
+# (arbiter): the same five questions of the same types.
+TRIAGE6 = {
+    "intent": {"type": "choice", "instructions": "What does the customer want in `message`?", "criteria": {
+        "refund": "money returned or a duplicate charge reversed",
+        "technical_help": "a bug, outage or integration problem",
+        "billing_question": "a question about an invoice, plan or payment method",
+        "information": "general information, pricing or how-to",
+        "cancellation": "wants to cancel or downgrade",
+        "other": "none of the other options fits"}},
+    "is_urgent": {"type": "noul", "instructions": "Does `message` communicate time pressure or a deadline?"},
+    "frustration": {"type": "score", "instructions": "How frustrated does the customer sound in `message`?", "criteria": [
+        "calm and neutral", "polite but concerned", "mildly annoyed", "clearly annoyed", "angry",
+        "very angry or using strong language"]},
+    "refund_requested": {"type": "noul", "instructions": "Does the customer ask for money back?"},
+    "churn_risk": {"type": "noul", "instructions": "Does `message` suggest the customer may leave for a competitor or cancel?"},
+}
+
 
 def call(url, path, body=None, timeout=1800):
     data = None if body is None else json.dumps(body).encode()
@@ -78,12 +103,14 @@ def call(url, path, body=None, timeout=1800):
 _turn = [0]
 
 
-def decide(url, model, preset="triage"):
+def decide(url, model, preset="triage", questions=None):
     state = STATES[_turn[0] % len(STATES)]
     _turn[0] += 1
     body = {"model": model, "state": state, "keep_alive": "30m"}
     if preset:
         body["preset"] = preset
+    if questions:
+        body["questions"] = questions
     t = time.perf_counter()
     out = call(url, "/api/decide", body)
     return (time.perf_counter() - t) * 1000, out
@@ -125,26 +152,92 @@ def machine_info(name):
             "os": "%s %s" % (platform.system(), platform.release())}
 
 
-def time_model(url, model, warm, n):
-    entry = {"model": model, "questions": "triage"}
-    try:
+class GpuMemory:
+    """The GPU's used memory in MiB, sampled every 100 ms by one long-running nvidia-smi."""
+
+    def __init__(self):
+        self.samples = []
+        self.proc = subprocess.Popen(
+            ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits", "-lms", "100"],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        threading.Thread(target=self._read, daemon=True).start()
+
+    def _read(self):
+        for line in self.proc.stdout:
+            try:
+                self.samples.append((time.monotonic(), float(line.split(",")[0])))
+            except ValueError:
+                pass
+
+    def window(self, t0, t1):
+        return [mb for t, mb in self.samples if t0 <= t <= t1]
+
+    def stop(self):
+        self.proc.terminate()
+
+
+def runner_pids():
+    """The Ollaya runner processes on this machine (`<exe> runner ...`)."""
+    pids = set()
+    for pid in os.listdir("/proc"):
+        if not pid.isdigit():
+            continue
         try:
-            load_ms, first = decide(url, model)
-            preset = "triage"
-        except urllib.error.HTTPError as e:
-            if e.code != 422:
-                raise
-            # A model with its own fixed questions (qwen3guard) takes no others: time those instead.
-            load_ms, first = decide(url, model, preset=None)
-            preset = None
-            entry["questions"] = "builtin (%d)" % len(first.get("answers", {}))
+            argv = open("/proc/%s/cmdline" % pid, "rb").read().split(b"\0")
+        except OSError:
+            continue
+        if len(argv) > 1 and argv[1] == b"runner" and b"ollaya" in os.path.basename(argv[0]):
+            pids.add(int(pid))
+    return pids
+
+
+def proc_memory(pid):
+    """(VmHWM, VmRSS) of a process in MiB."""
+    out = {}
+    try:
+        for line in open("/proc/%d/status" % pid, encoding="utf-8"):
+            if line.startswith(("VmHWM:", "VmRSS:")):
+                key, value = line.split(":", 1)
+                out[key] = int(value.split()[0]) / 1024
+    except OSError:
+        pass
+    return out.get("VmHWM"), out.get("VmRSS")
+
+
+def time_model(url, model, warm, n, gpu=None, memory=False):
+    entry = {"model": model, "questions": "triage"}
+    unload(url, model)  # time a cold load even if something loaded the model before
+    if memory:
+        time.sleep(2)  # let the previous runner exit and its memory go
+    before = runner_pids() if memory else set()
+    if gpu is not None:
+        t_idle = time.monotonic()
+        time.sleep(1)
+        idle = gpu.window(t_idle, time.monotonic())
+    t_start = time.monotonic()
+    try:
+        # The triage preset; for a model that rejects it, the same questions with a six-level score
+        # (arbiter); for a model with its own fixed questions (qwen3guard), those.
+        modes = [("triage", None, "triage"), (None, TRIAGE6, "triage, frustration on six levels"), (None, None, None)]
+        for i, (preset, questions, label) in enumerate(modes):
+            try:
+                load_ms, first = decide(url, model, preset, questions)
+                break
+            except urllib.error.HTTPError as e:
+                if e.code != 422 or i == len(modes) - 1:
+                    raise
+        if i:  # the rejected tries loaded the model: load it again to time a cold load
+            unload(url, model)
+            time.sleep(1)
+            load_ms, first = decide(url, model, preset, questions)
+        entry["questions"] = label or "builtin (%d)" % len(first.get("answers", {}))
         entry["load_ms"] = round(first.get("load_duration", 0) / 1e6, 1)
         entry["first_request_ms"] = round(load_ms, 1)
         for _ in range(warm):
-            decide(url, model, preset)
+            decide(url, model, preset, questions)
         times, evals = [], []
         for _ in range(n):
-            ms, out = decide(url, model, preset)
+            ms, out = decide(url, model, preset, questions)
             times.append(ms)
             evals.append(out.get("eval_duration", 0) / 1e6)
         times.sort()
@@ -160,6 +253,19 @@ def time_model(url, model, warm, n):
         running = ps.get(first.get("model")) or next(iter(ps.values()), {})
         entry["device"] = running.get("device")
         entry["precision"] = running.get("details", {}).get("quantization_level")
+        entry["digest"] = running.get("digest")
+        if memory:
+            entry["size_mb"] = round(running.get("size", 0) / 2**20) if running.get("size") else None
+            new = sorted(runner_pids() - before)
+            if len(new) == 1:
+                hwm, rss = proc_memory(new[0])
+                entry["ram_peak_mb"] = round(hwm) if hwm is not None else None
+                entry["ram_mb"] = round(rss) if rss is not None else None
+            if gpu is not None:
+                busy = gpu.window(t_start, time.monotonic())
+                if idle and busy:
+                    entry["vram_mb"] = round(max(busy) - min(idle))
+                    entry["gpu_idle_mb"] = round(min(idle))
     except urllib.error.HTTPError as e:
         entry["error"] = "HTTP %d: %s" % (e.code, e.read()[:300].decode(errors="replace"))
     except (urllib.error.URLError, OSError, ValueError) as e:
@@ -179,6 +285,8 @@ def main():
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--out", required=True)
     ap.add_argument("--note", default="")
+    ap.add_argument("--resume", action="store_true", help="keep the models --out already has without an error")
+    ap.add_argument("--memory", action="store_true", help="also measure each model's GPU and CPU memory (Linux, local server)")
     a = ap.parse_args()
     url = a.url.rstrip("/")
 
@@ -209,14 +317,24 @@ def main():
         "note": a.note,
         "results": [],
     }
+    if a.memory:
+        result["protocol"]["memory"] = ("vram_mb: peak rise of the GPU's used memory over its idle level before the load "
+                                        "(nvidia-smi, 100 ms); ram_peak_mb and ram_mb: the runner's VmHWM and VmRSS")
+    gpu = GpuMemory() if a.memory and a.device.startswith("cuda") else None
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+    if a.resume and os.path.exists(a.out):
+        kept = [e for e in json.load(open(a.out, encoding="utf-8"))["results"] if "error" not in e]
+        result["results"] = kept
+        models = [m for m in models if m not in {e["model"] for e in kept}]
     for model in models:
-        entry = time_model(url, model, a.warm, a.n)
+        entry = time_model(url, model, a.warm, a.n, gpu, a.memory)
         result["results"].append(entry)
         print("%-24s %s" % (model, entry.get("error") or "p50 %.1f ms on %s" % (entry["p50_ms"], entry["device"])),
               flush=True)
         with open(a.out, "w", encoding="utf-8") as f:
             json.dump(result, f, indent=1)
+    if gpu is not None:
+        gpu.stop()
     print("wrote", a.out)
 
 

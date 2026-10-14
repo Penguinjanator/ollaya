@@ -1,6 +1,7 @@
 # Results
 
-Every measurement behind [ollaya.dev/results](https://ollaya.dev/results), as data. The site reads these files
+Every measurement behind [ollaya.dev/results](https://ollaya.dev/results) and
+[bench.ollaya.dev](https://bench.ollaya.dev) (Ollaya Bench), as data. The site reads these files
 at build time (`site/scripts/gen-results.mjs`), draws its charts from them and publishes each file unchanged
 under `/data/results/`. Nothing on the results page is typed in by hand.
 
@@ -9,6 +10,7 @@ results/
   machines.json            the machines the runs name, by id
   runs/*.json              one measurement session each
   runs/parity-docs.json    parity numbers compiled from docs/families/*.md, each with its citation
+  editions/<id>.json       an Ollaya Bench edition: the runs it is made of, its models, scores and flags
 ```
 
 ## Machines
@@ -27,7 +29,7 @@ results/
 ## Runs
 
 Every run file has `schema: 1`, a `suite`, a `date` and, except `parity-docs.json`, a `machine` id that
-`machines.json` defines. The build fails on an unknown schema or machine. Three suites exist:
+`machines.json` defines. The build fails on an unknown schema or machine. Four suites exist:
 
 - **`latency-triage`**: the speed chart. One model at a time on one device, the five-question triage preset
   over HTTP to `/api/decide`, 30 different short messages in turn, 5 warm-up requests, then 20 timed
@@ -39,9 +41,26 @@ Every run file has `schema: 1`, a `suite`, a `date` and, except `parity-docs.jso
   (3,880 questions) through `/v1/systemone`, scored by their own runner (`convert/ollaya_convert/bench_public.py`).
   Each result has `server`, `model`, `macro_accuracy`, `pooled_ece`, `brier`, `median_ms`, `p95_ms`, and
   `by_type` and `per_subset` breakdowns.
+- **`typed-decisions`**: the typed-decisions test split (400 JSON states, five questions each) through
+  `/v1/systemone`, one state per request (`convert/ollaya_convert/bench_typed.py`). Each result has `model`,
+  `accuracy` and its 95 % bootstrap `accuracy_ci`, `by_type`, `by_workflow`, `ece`, `brier`, `soft_ce`,
+  `median_ms`, `errors` and `trained_on_split`.
 - **`parity`**: the runtime against the reference on one device (`max_logit_diff`, `max_prob_diff`,
   `decisions_same` of `questions`, `pass`), with an optional `cross_device` block for differences between
   devices, which are measured and not gated (docs/decisions/0003-llama-cpp-runtime.md, point 7).
+
+Latency runs measured with `--memory` also carry `vram_mb` (the GPU's used memory over its idle level while
+the model is loaded), `ram_peak_mb` and `ram_mb` (the runner's VmHWM and VmRSS), `size_mb` (the server's
+estimate) and the model's manifest `digest`.
+
+## Editions
+
+An Ollaya Bench edition (`editions/<id>.json`, e.g. `2026.10`) freezes one measurement session: the
+release it ran, the machine, the runs (file names under `runs/`), the models, and the score (the mean
+chance-corrected accuracy over the 13 public subsets and typed-decisions, with a bootstrap interval).
+`convert/ollaya_convert/bench_edition.py` writes the edition and its run files from the raw outputs of
+`bench_latency.py --memory`, `bench_typed.py` and `bench_public.py`. bench.ollaya.dev shows the newest
+edition; earlier ones stay as they were published.
 
 ## Adding a run
 

@@ -6,3 +6,5 @@ src/generated/
 .dist-tmp/
 dist-bench/
 .dist-bench-tmp/
+# Ollaya Bench social cards, made per edition by scripts/og-bench.mjs at deploy time
+bench-public/static/og/

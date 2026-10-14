@@ -21,6 +21,9 @@ export interface BenchMeta {
   description?: string
   nav?: BenchNav
   noindex?: boolean
+  /** Social card under /static, made by scripts/og-bench.mjs; pages without one use og-bench.png. */
+  ogImage?: string
+  ogAlt?: string
 }
 
 const links: { key: BenchNav; href: string; label: string }[] = [
@@ -120,7 +123,9 @@ export function BenchLayout({
   const title = meta.title ? `${meta.title} · ${BENCH_NAME}` : `${BENCH_NAME} · ${BENCH_TAGLINE.replace(/\.$/, '')}`
   const description = meta.description ?? BENCH_DESCRIPTION
   const canonical = `${origin}${path}`
-  const ogImage = hasAsset('og-bench.png') ? `${origin}${asset('og-bench.png')}` : null
+  const card = meta.ogImage && hasAsset(meta.ogImage) ? meta.ogImage : 'og-bench.png'
+  const ogImage = hasAsset(card) ? `${origin}${asset(card)}` : null
+  const ogAlt = card === meta.ogImage && meta.ogAlt ? meta.ogAlt : `${BENCH_NAME}: ${BENCH_TAGLINE}`
   return (
     <html lang="en">
       <head>
@@ -134,7 +139,7 @@ export function BenchLayout({
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
         <meta property="og:site_name" content={BENCH_NAME} />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content={meta.title ?? `${BENCH_NAME} · ${BENCH_TAGLINE}`} />
+        <meta property="og:title" content={meta.title ? `${meta.title} · ${BENCH_NAME}` : `${BENCH_NAME} · ${BENCH_TAGLINE}`} />
         <meta property="og:description" content={description} />
         <meta property="og:url" content={canonical} />
         {ogImage ? (
@@ -142,6 +147,7 @@ export function BenchLayout({
             <meta property="og:image" content={ogImage} />
             <meta property="og:image:width" content="1200" />
             <meta property="og:image:height" content="630" />
+            <meta property="og:image:alt" content={ogAlt} />
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:image" content={ogImage} />
           </>

@@ -99,7 +99,12 @@ export async function renderBench({ origin, main, assetVersions }: BenchOptions)
     pages.push({
       url: i === 0 ? '/' : `/hardware/${d.slug}`,
       files: [i === 0 ? 'index.html' : `hardware/${d.slug}.html`],
-      meta: i === 0 ? { nav: 'leaderboard' } : { title: `Leaderboard on the ${d.name}`, description: `Every open decision model on the ${d.name} (${d.kind}): score, latency and memory.`, nav: 'leaderboard' },
+      meta: {
+        ...(i === 0 ? {} : { title: `Leaderboard on the ${d.name}`, description: `Every open decision model on the ${d.name} (${d.kind}): score, latency and memory.` }),
+        nav: 'leaderboard',
+        ogImage: `og/hardware/${d.slug}.png`,
+        ogAlt: `The five highest-scoring models on the ${d.name}, with their latency`,
+      },
       render: () => <LeaderboardPage device={d} />,
     })
   })
@@ -122,7 +127,13 @@ export async function renderBench({ origin, main, assetVersions }: BenchOptions)
     pages.push({
       url: modelUrl(r.name),
       files: modelFiles(r.name),
-      meta: { title: r.name, description: `${r.name} on Ollaya Bench ${edition?.id}: ${s}, measured on ${devices.map((d) => d.name).join(' and ')}.`, nav: 'leaderboard' },
+      meta: {
+        title: r.name,
+        description: `${r.name} on Ollaya Bench ${edition?.id}: ${s}, measured on ${devices.map((d) => d.name).join(' and ')}.`,
+        nav: 'leaderboard',
+        ogImage: `og/models/${r.name.replace(':', '/')}.png`,
+        ogAlt: `${r.name} on Ollaya Bench: ${s}, with its accuracy, speed and memory`,
+      },
       render: () => <ModelPage r={r} origin={origin} main={main} />,
     })
   }

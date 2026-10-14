@@ -117,6 +117,22 @@ The site is built for **Cloudflare Workers static assets**, with no `main` scrip
 
 `python3 -m http.server` works for spot checks, but it has no clean URLs (open `/search.html`).
 
+## Ollaya Bench (bench.ollaya.dev)
+
+The same sources build a second static site: Ollaya Bench, made from the newest edition in
+`../results/editions` (see `../results/README.md` and `../docs/decisions/0007-ollaya-bench.md`).
+
+| Script | What it does |
+|---|---|
+| `npm run build:bench` | `gen`, then `scripts/build-bench.mjs`: pages, badges, data files and the JSON API → `dist-bench/`, with its own link checks |
+| `npm run og:bench` | Build, then `scripts/og-bench.mjs`: a social card per device and per model into `bench-public/static/og/` (not committed; needs a Chromium) |
+| `npm run dev:bench` | `build:bench` + `wrangler dev -c wrangler.bench.jsonc` |
+| `npm run deploy:bench` | `og:bench`, `build:bench`, then `wrangler deploy -c wrangler.bench.jsonc` (Worker `ollaya-bench`) |
+
+Sources: `src/bench/` (pages, charts, data), `bench-public/` (headers, redirects, `bench.js`, the
+default card). `npm run build` builds and checks both sites. `BENCH_ORIGIN` sets the bench's origin
+(default `https://bench.ollaya.dev`); ollaya.dev links to it from its header and footer.
+
 ## Domain
 
 The public origin is set **at build time** with the `SITE_ORIGIN` environment variable

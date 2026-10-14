@@ -16,7 +16,8 @@
     "dev": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "dev:bench": "npm run build:bench && wrangler dev -c wrangler.bench.jsonc",
-    "deploy:bench": "npm run build:bench && wrangler deploy -c wrangler.bench.jsonc"
+    "og:bench": "npm run build:bench && node scripts/og-bench.mjs",
+    "deploy:bench": "npm run og:bench && npm run build:bench && wrangler deploy -c wrangler.bench.jsonc"
   },
   "devDependencies": {
     "@tailwindcss/cli": "4.3.3",

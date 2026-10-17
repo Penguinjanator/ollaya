@@ -329,7 +329,13 @@
   }
 }
 
-/* Hero terminal: a soft lift off the page, bars that fill, rows that appear in turn. */
+/*
+ * Hero terminal: a soft lift off the page, rows that appear in turn. Then the alternatives fold
+ * under each answer and the prompt comes back. While they show, the window hangs into the space
+ * under the hero by their height (--fold-h, from home.tsx; a negative margin), and takes it back
+ * in step as they close, so nothing on the page moves. Without motion nothing folds: the scores
+ * and the answers (.term-static) stand one under the other.
+ */
 @layer components {
   .term-glow {
     box-shadow:
@@ -347,9 +353,29 @@
     }
   }
   @media (prefers-reduced-motion: no-preference) {
+    .term-fig {
+      --fold-at: 2.8s;
+      margin-bottom: calc(-1 * var(--fold-h, 0rem));
+      animation: term-settle 0.5s ease-in-out var(--fold-at) forwards;
+    }
+    .term-static {
+      display: none;
+    }
     .term-row {
       animation: term-in 0.4s ease-out both;
-      animation-delay: calc(0.35s + var(--row, 0) * 0.09s);
+      animation-delay: calc(0.35s + var(--row, 0) * 0.05s);
+    }
+    /* The same timing as term-settle, so the margin gives back exactly what the lines take. */
+    .term-fold {
+      overflow: hidden;
+      animation:
+        term-in 0.4s ease-out both,
+        term-fold 0.5s ease-in-out forwards;
+      animation-delay: calc(0.35s + var(--row, 0) * 0.05s), var(--fold-at);
+    }
+    .term-after {
+      animation: term-in 0.4s ease-out both;
+      animation-delay: calc(var(--fold-at) + 0.3s);
     }
     .term-cursor {
       animation: term-blink 1.1s steps(1) infinite;
@@ -361,6 +387,23 @@
   from {
     opacity: 0;
     transform: translateY(3px);
+  }
+}
+
+@keyframes term-settle {
+  to {
+    margin-bottom: 0;
+  }
+}
+
+/* The line fades first, then closes up. */
+@keyframes term-fold {
+  40% {
+    opacity: 0;
+  }
+  to {
+    height: 0;
+    opacity: 0;
   }
 }
 

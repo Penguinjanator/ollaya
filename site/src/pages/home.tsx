@@ -5,6 +5,7 @@ import { LogoMark } from '../components/Logo'
 import { Legend } from '../components/charts'
 import { btnPrimary, Code, CodeBlock, textLink } from '../components/ui'
 import { catalog, comingNext, featuredTags, fullName } from '../data/catalog'
+import { hero, type HeroOption, type HeroQuestion } from '../data/hero'
 import { GITHUB_URL, LOCAL_API } from '../site'
 
 const sections = [
@@ -53,7 +54,7 @@ export function HomePage() {
 
 function Hero() {
   return (
-    <section class="mx-auto max-w-6xl px-4 pt-10 md:px-6 md:pt-20" aria-labelledby="hero-title">
+    <section class="mx-auto max-w-6xl px-4 pt-10 pb-8 md:px-6 md:pt-20" aria-labelledby="hero-title">
       <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
         <div>
           <h1
@@ -88,25 +89,46 @@ function Hero() {
   )
 }
 
-// Real output of the command shown (the default triage preset), run on an RTX 4090 through the CLI
-// with `--verbose` timings: winnow:e4b answered its five questions in 87 ms (median of ten warm
-// runs). The first line holds the prompt; the others hang under it.
-// The command, then the state: a quoted message that continues on the next lines. Short lines, so
-// nothing wraps on a phone.
-const MOCK_COMMAND = 'ollaya run winnow:e4b \\'
-const MOCK_MESSAGE = [
-  '"Third time this year you\'ve',
-  'double-charged me. Refund it',
-  'today or I\'m cancelling and',
-  'moving to a competitor."',
-]
-const mockRows = [
-  { q: 'intent', a: 'refund', p: 0.91 },
-  { q: 'is_urgent', a: 'yes', p: 0.92 },
-  { q: 'frustration', a: '2.89 / 3', note: 'very angry', p: 0.86 },
-  { q: 'refund_requested', a: 'yes', p: 0.99 },
-  { q: 'churn_risk', a: 'yes', p: 0.99 },
-]
+// The terminal is drawn from the recorded output of the command it shows (src/data/hero.json, read
+// by src/data/hero.ts), in two steps: each question with its own options and the probability the
+// model gave each, then the options fold away and each question's top option stays as its answer.
+// With reduced motion the two steps stand one under the other.
+//
+// The command, then the state: a quoted message that continues on the next lines, wrapped shorter
+// on a phone so nothing wraps again. The first line holds the prompt; the others hang under it. The
+// default preset (triage) needs no flag.
+const MOCK_COMMAND = `ollaya run ${hero.model}${hero.preset === 'triage' ? '' : ` --preset ${hero.preset}`} \\`
+const MOCK_MESSAGE = { phone: wrapWords(`"${hero.message}"`, 28), wide: wrapWords(`"${hero.message}"`, 44) }
+
+/** Greedy word wrap at `width` characters. */
+function wrapWords(text: string, width: number): string[] {
+  const lines: string[] = []
+  let line = ''
+  for (const word of text.split(' ')) {
+    if (line && line.length + 1 + word.length > width) {
+      lines.push(line)
+      line = word
+    } else line = line ? `${line} ${word}` : word
+  }
+  return [...lines, line]
+}
+
+const sumP = (options: HeroOption[]) => options.reduce((s, o) => s + o.p, 0)
+
+/** Under its answer a question shows the runner-up, and folds any others into "+N more". */
+function alternativesOf(q: HeroQuestion): HeroOption[] {
+  if (q.others.length <= 2) return q.others
+  const [runnerUp, ...more] = q.others
+  return [...(runnerUp ? [runnerUp] : []), { label: `+${more.length} more`, p: sumP(more) }]
+}
+
+// The alternatives are h-5 (1.25rem) lines. While they show, the window hangs that much into the
+// space under the hero (term-fig in app.css; the hero's pb-8 keeps it clear of the next section)
+// and takes it back as they fold, so nothing under it moves and the window ends the size of the
+// answers alone.
+const FOLD_REM = hero.questions.reduce((n, q) => n + alternativesOf(q).length, 0) * 1.25
+
+const NUMBER_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
 
 /** One command line: the prompt in its own column, so continuation lines hang under the command. */
 function PromptLine({ children }: { children?: Child }) {
@@ -120,10 +142,72 @@ function PromptLine({ children }: { children?: Child }) {
   )
 }
 
-function TerminalMock() {
+/** One option: its label, a bar and the probability. The answer is bright; the others are dim. */
+function OptionLine({
+  label,
+  full,
+  p,
+  answer,
+  class: cls = '',
+  style,
+}: HeroOption & { answer: boolean; class?: string; style?: string }) {
   return (
-    // On wide screens the caption is taken out of the flow, so the hero text centres on the window.
-    <figure class="relative min-w-0">
+    <li class={`flex items-center gap-[1ch] ${answer ? 'h-6' : 'h-5 leading-5'} ${cls}`} style={style}>
+      <span class={`min-w-0 flex-1 truncate ${answer ? 'font-medium text-fg' : 'text-muted'}`} title={full}>
+        {label}
+        {full ? <span class="sr-only">{full.slice(label.length)}</span> : null}
+        {answer ? <span class="sr-only">, the answer</span> : null}
+      </span>
+      <span class="h-1.5 w-16 shrink-0 overflow-hidden rounded-full bg-fill-strong sm:w-20" aria-hidden="true">
+        <span class={`block h-full rounded-full ${answer ? 'term-bar' : 'bg-faint'}`} style={`width:${(p * 100).toFixed(1)}%`}></span>
+      </span>
+      <span class={`w-[4ch] text-right tabular-nums ${answer ? 'text-fg' : 'text-muted'}`}>{p.toFixed(2)}</span>
+    </li>
+  )
+}
+
+/**
+ * The questions, each beside its answer and alternatives (above them on a phone). `answersOnly`
+ * leaves the answers alone, as the scores look once they have folded.
+ */
+function Scores({ answersOnly = false }: { answersOnly?: boolean }) {
+  let row = 0
+  return (
+    <dl>
+      {hero.questions.map((q, qi) => {
+        const alternatives = answersOnly ? [] : alternativesOf(q)
+        const start = row
+        row += 1 + alternatives.length
+        // Lines appear in turn; then the alternatives fold away.
+        const line = (i: number) => (answersOnly ? {} : { class: i ? 'term-fold' : 'term-row', style: `--row:${start + i}` })
+        return (
+          <div class={`sm:grid sm:grid-cols-[17ch_minmax(0,1fr)] ${qi ? 'mt-1' : ''}`}>
+            <dt class={`h-5 truncate leading-5 text-muted sm:h-6 sm:leading-6 ${answersOnly ? '' : 'term-row'}`} style={answersOnly ? undefined : `--row:${start}`}>
+              {q.name}
+            </dt>
+            <dd class="min-w-0 pl-[2ch] sm:pl-0">
+              <ol>
+                <OptionLine {...q.answer} answer {...line(0)} />
+                {alternatives.map((o, i) => (
+                  <OptionLine {...o} answer={false} {...line(i + 1)} />
+                ))}
+              </ol>
+            </dd>
+          </div>
+        )
+      })}
+    </dl>
+  )
+}
+
+function TerminalMock() {
+  const n = hero.questions.length
+  return (
+    // On wide screens the captions are taken out of the flow, so the hero text centres on the window.
+    <figure class="term-fig relative z-10 min-w-0" style={`--fold-h:${FOLD_REM}rem`}>
+      <figcaption class="mb-3 text-center text-xs text-body lg:absolute lg:inset-x-0 lg:bottom-full">
+        Every question has its own options. The model scores each; the top one is the answer.
+      </figcaption>
       <div class="term-glow overflow-hidden rounded-xl border border-line bg-term">
         <div class="relative flex h-10 items-center border-b border-line px-4 sm:px-5" aria-hidden="true">
           <span class="flex gap-2">
@@ -138,54 +222,33 @@ function TerminalMock() {
             <pre class="whitespace-pre-wrap">
               <Code code={MOCK_COMMAND} lang="shell" />
             </pre>
-            {MOCK_MESSAGE.map((line, i) => (
-              <pre class={`whitespace-pre-wrap ${i ? 'pl-[3ch]' : 'pl-[2ch]'}`}>
-                <span class="tok-string">{line}</span>
-              </pre>
-            ))}
+            {(['phone', 'wide'] as const).map((size) =>
+              MOCK_MESSAGE[size].map((line, i) => (
+                <pre class={`whitespace-pre-wrap ${i ? 'pl-[3ch]' : 'pl-[2ch]'} ${size === 'phone' ? 'sm:hidden' : 'hidden sm:block'}`}>
+                  <span class="tok-string">{line}</span>
+                </pre>
+              )),
+            )}
           </PromptLine>
-          <table class="mt-4 w-full border-collapse text-left">
-            <caption class="sr-only">Answers returned by the model</caption>
-            <thead class="sr-only">
-              <tr>
-                <th scope="col">Question</th>
-                <th scope="col">Answer</th>
-                <th scope="col">Probability</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mockRows.map((r, i) => (
-                <tr class="term-row" style={`--row:${i}`}>
-                  <td class="w-[18ch] py-0.5 pr-4 align-middle whitespace-nowrap text-muted">{r.q}</td>
-                  <td class="py-0.5 pr-4 align-middle font-medium whitespace-nowrap">
-                    {r.a}
-                    {r.note ? <span class="hidden font-normal text-muted sm:inline">{`  ${r.note}`}</span> : null}
-                  </td>
-                  <td class="w-0 py-0.5 align-middle">
-                    <span class="flex items-center justify-end gap-3">
-                      <span
-                        class="hidden h-1.5 w-16 overflow-hidden rounded-full bg-fill-strong min-[420px]:block sm:w-20"
-                        aria-hidden="true"
-                      >
-                        <span class="term-bar block h-full rounded-full" style={`width:${Math.round(r.p * 100)}%`}></span>
-                      </span>
-                      <span class="tabular-nums">{r.p.toFixed(2)}</span>
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div class="term-row mt-4" style={`--row:${mockRows.length}`}>
-            <PromptLine>
-              <span class="term-cursor inline-block h-[1.15em] w-[1ch] translate-y-[0.2em] bg-fg/80" aria-hidden="true"></span>
-            </PromptLine>
+          <div class="mt-4">
+            <p class="term-static text-tok-comment"># 1. each question's options, scored</p>
+            <Scores />
+            <div class="term-static mt-4" aria-hidden="true">
+              <p class="text-tok-comment"># 2. the top option is the answer</p>
+              <Scores answersOnly />
+            </div>
+            <div class="term-after mt-4">
+              <PromptLine>
+                <span class="term-cursor inline-block h-[1.15em] w-[1ch] translate-y-[0.2em] bg-fg/80" aria-hidden="true"></span>
+              </PromptLine>
+            </div>
           </div>
         </div>
       </div>
-      <figcaption class="mt-3 text-center text-xs text-muted lg:absolute lg:inset-x-0 lg:top-full">
-        Real output: <span class="font-mono">winnow:e4b</span> answered five questions in 87 ms on an RTX 4090.
-      </figcaption>
+      <p class="term-after mt-3 text-center text-xs text-muted lg:absolute lg:inset-x-0 lg:top-full">
+        Real output: <span class="font-mono">{hero.model}</span> answered {NUMBER_WORDS[n] ?? n} questions in {hero.latencyMs} ms on
+        an {hero.device}.
+      </p>
     </figure>
   )
 }

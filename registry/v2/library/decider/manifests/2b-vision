@@ -12,10 +12,10 @@
   "layers": [
     {
       "mediaType": "application/vnd.ollaya.graph.onnx",
-      "digest": "sha256:68db9945404bdd90b98b5e2312bdf0e3196207ede03d3017e0ee868a27344924",
-      "size": 6741628,
+      "digest": "sha256:9cc49d04b7be7e30b0f39504803963e1a33b953670a01eeadef8f520b5557187",
+      "size": 6682618,
       "urls": [
-        "https://ollaya.dev/blobs/sha256-68db9945404bdd90b98b5e2312bdf0e3196207ede03d3017e0ee868a27344924"
+        "https://ollaya.dev/blobs/sha256-9cc49d04b7be7e30b0f39504803963e1a33b953670a01eeadef8f520b5557187"
       ],
       "annotations": {
         "org.ollaya.precision": "fp32"

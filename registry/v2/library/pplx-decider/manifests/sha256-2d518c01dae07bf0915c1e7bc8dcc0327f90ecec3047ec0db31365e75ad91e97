@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+  "config": {
+    "mediaType": "application/vnd.ollaya.config.v1+json",
+    "digest": "sha256:95fd186d6f3f97df2cef53b709b1d4d0ac3f61483242a0e64c68b21e5356dba8",
+    "size": 858,
+    "urls": [
+      "https://ollaya.dev/blobs/sha256-95fd186d6f3f97df2cef53b709b1d4d0ac3f61483242a0e64c68b21e5356dba8"
+    ]
+  },
+  "layers": [
+    {
+      "mediaType": "application/vnd.ollaya.graph.onnx",
+      "digest": "sha256:53b1e1de9a918f20e53bdfb6e2bd061edabdc0a3a293594ee85a81abecdbdee0",
+      "size": 11793014,
+      "urls": [
+        "https://ollaya.dev/blobs/sha256-53b1e1de9a918f20e53bdfb6e2bd061edabdc0a3a293594ee85a81abecdbdee0"
+      ],
+      "annotations": {
+        "org.ollaya.precision": "fp16"
+      }
+    },
+    {
+      "mediaType": "application/vnd.ollaya.weights",
+      "digest": "sha256:1c1a0c1ab331c7aec1b4b7932eabf80593b56c694fe2b779209c0e0413df1cef",
+      "size": 4972946624,
+      "urls": [
+        "https://huggingface.co/perplexity-ai/pplx-decider-flash-v1.2/resolve/6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d/model-00001-of-00002.safetensors"
+      ]
+    },
+    {
+      "mediaType": "application/vnd.ollaya.weights",
+      "digest": "sha256:21ba8301660e066f5849b60b1a36a242fc54ca18dd9bd526fdcbc50889171b70",
+      "size": 4105669472,
+      "urls": [
+        "https://huggingface.co/perplexity-ai/pplx-decider-flash-v1.2/resolve/6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d/model-00002-of-00002.safetensors"
+      ]
+    },
+    {
+      "mediaType": "application/vnd.ollaya.weights",
+      "digest": "sha256:6751578171026190d4db8078e97162b404fd984646e0e9aec13844e4dd5b1711",
+      "size": 1305712,
+      "urls": [
+        "https://huggingface.co/perplexity-ai/pplx-decider-flash-v1.2/resolve/6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d/readout.safetensors"
+      ]
+    },
+    {
+      "mediaType": "application/vnd.ollaya.tokenizer",
+      "digest": "sha256:6f32ce20dc35f57a7f9ad1eac03525bd7d30f9df8cea6507e958279cc3657706",
+      "size": 19989492,
+      "urls": [
+        "https://huggingface.co/perplexity-ai/pplx-decider-flash-v1.2/resolve/6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d/tokenizer.json"
+      ]
+    },
+    {
+      "mediaType": "application/vnd.ollaya.decision",
+      "digest": "sha256:dac0a11b7ea1dc6c07041ea1bc35c0104535e8b3988c243473e8eb4be1c58a77",
+      "size": 5617,
+      "urls": [
+        "https://ollaya.dev/blobs/sha256-dac0a11b7ea1dc6c07041ea1bc35c0104535e8b3988c243473e8eb4be1c58a77"
+      ]
+    },
+    {
+      "mediaType": "application/vnd.ollaya.calibration",
+      "digest": "sha256:4e7a506638b7296dc2db239241ff59ed9d08d89b6bda3df061d9565fb718c00f",
+      "size": 223,
+      "urls": [
+        "https://ollaya.dev/blobs/sha256-4e7a506638b7296dc2db239241ff59ed9d08d89b6bda3df061d9565fb718c00f"
+      ]
+    },
+    {
+      "mediaType": "application/vnd.ollaya.license",
+      "digest": "sha256:74080187543cf93c8acf604615a67e096b93ad891aeffe68029a474b057019b8",
+      "size": 10502,
+      "urls": [
+        "https://ollaya.dev/blobs/sha256-74080187543cf93c8acf604615a67e096b93ad891aeffe68029a474b057019b8"
+      ]
+    }
+  ]
+}

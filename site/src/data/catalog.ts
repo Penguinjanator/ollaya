@@ -223,6 +223,7 @@ const overlays: Record<string, ModelOverlay> = {
     tags: {
       latest: { summary: 'Same as nimble:9b.' },
       '9b': { summary: "Bespoke-Nimble-9B v2 (LoRA on Qwen3.5-9B) with the author's temperature 2.18. Needs a 24 GB GPU." },
+      '9b-v3': { summary: "Bespoke-Nimble-9B v3: v2's prompts with a new LoRA, served as the author's Decision Index engine. CC BY-NC 4.0 (non-commercial). Needs a 24 GB GPU." },
     },
   },
   jeeves: {
@@ -338,6 +339,32 @@ const overlays: Record<string, ModelOverlay> = {
     tags: {
       latest: { summary: 'Same as arbiter:4b.' },
       '4b': { summary: 'Arbiter v3.3 on Gemma 3 4B IT (weights kept BF16, about 8 GB): noul, up to 16 options, 6-level scores.' },
+    },
+  },
+  'strands-decider': {
+    title: 'Strands Decider',
+    description:
+      "Strands Agents' decision model: a LoRA and a pointer head on Qwen3.5-2B base. Each question is one row with a line per option, every option scored at the end of its own line, and the probabilities are calibrated with the authors' temperature for each question type. Up to 255 options.",
+    publisher: { name: 'Strands Agents', url: 'https://huggingface.co/StrandsAgents' },
+    capabilities: ['decision', 'fine-tuned'],
+    keywords: ['strands', 'strands decider', 'strands agents', 'amazon', 'qwen', 'qwen3.5', 'lora', 'pointer', 'llm', 'decision', 'classification', 'typesafe', 'jev', 'system one'],
+    rank: 21,
+    tags: {
+      latest: { summary: 'Same as strands-decider:2b.' },
+      '2b': { summary: 'strands-decider-2B-qwen3.5-v1-2610 (LoRA and pointer head on Qwen3.5-2B base), about 8 GB in memory.' },
+    },
+  },
+  'pplx-decider': {
+    title: 'pplx-decider',
+    description:
+      "Perplexity's decision model: Qwen3.5-4B distilled from its 27B decision models, with a readout over 255 answer codes. Every question of a request shares one sequence and reads the whole request, and the probabilities are calibrated with Perplexity's temperature. Up to 255 options.",
+    publisher: { name: 'Perplexity AI', url: 'https://huggingface.co/perplexity-ai' },
+    capabilities: ['decision', 'multilingual', 'fine-tuned'],
+    keywords: ['pplx', 'pplx-decider', 'perplexity', 'qwen', 'qwen3.5', 'distilled', 'joint', 'llm', 'decision', 'classification', 'typesafe', 'jev', 'system one'],
+    rank: 22,
+    tags: {
+      latest: { summary: 'Same as pplx-decider:flash.' },
+      flash: { summary: 'pplx-decider-flash-v1.2 (Qwen3.5-4B), about 9 GB in memory.' },
     },
   },
   decima: {

@@ -24,12 +24,14 @@ pub mod layout;
 pub mod llm_logits;
 pub mod nimble;
 pub mod nli;
+pub mod pplx;
 mod printable;
 pub mod pyjson;
 pub mod pyrepr;
 pub mod question;
 pub mod qwen3guard;
 pub mod snap;
+pub mod strands;
 pub mod von;
 pub mod winnow;
 

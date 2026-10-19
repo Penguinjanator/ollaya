@@ -130,6 +130,13 @@ def _kev_license(repo, base):
             "Licensed under the Apache License, Version 2.0.\n\n" % (repo, base, base)) + LICENSE_APACHE
 
 
+NIMBLE_V3_LICENSE = (
+    "Bespoke-Nimble-9B-v3 by Bespoke Labs (https://huggingface.co/bespokelabs/Bespoke-Nimble-9B-v3)\n"
+    "LoRA adapter: Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0), per the model card: "
+    "it may not be used for commercial purposes. https://creativecommons.org/licenses/by-nc/4.0/legalcode\n"
+    "Base model: Qwen3.5-9B by the Qwen team (https://huggingface.co/Qwen/Qwen3.5-9B), Apache-2.0.\n\n") + LICENSE_APACHE
+
+
 LICENSE_MIT_NLI = ("DeBERTa-v3-large zero-shot v2.0 by Moritz Laurer "
                    "(https://huggingface.co/MoritzLaurer/deberta-v3-large-zeroshot-v2.0), MIT License.\n"
                    "Note from the model card: part of the training data carries non-commercial licenses.\n")
@@ -313,12 +320,29 @@ CATALOG = {
                                   ("Qwen/Qwen3.5-9B", "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
                                    "model.safetensors-%05d-of-00004.safetensors" % i) for i in range(1, 5)},
                                "adapter_model.safetensors": "adapter_model.safetensors"}),
+            # v3 is CC BY-NC 4.0 (v2 Apache-2.0), so `latest` stays on v2. Its tokenizer is v2's file: what
+            # transformers 5 rebuilds from the base, which the author's engine loads (families/nimble/ref_v3.py).
+            "9b-v3": dict(_wl("nimble-9b-v3", "bespokelabs/Bespoke-Nimble-9B-v3", "8e927b9b4afdbb14479fac10a7364d1a695be208",
+                              "Bespoke Labs' Nimble v3: v2's prompts and readout with a new rank-64 LoRA, served as the "
+                              "author's Decision Index engine (softmax at temperature 1, prompts up to 32,768 tokens). "
+                              "Non-commercial license (CC BY-NC 4.0). Needs about 18 GB of memory; best on a 24 GB GPU.",
+                              "9B", 32768, ["en"], wl_dir=os.path.join(OUT, "nimble-9b-v3"),
+                              license="CC-BY-NC-4.0 (adapter) and Apache-2.0 (base model)",
+                              license_text=NIMBLE_V3_LICENSE,
+                              weights={**{"model.safetensors-%05d-of-00004.safetensors" % i:
+                                          ("Qwen/Qwen3.5-9B", "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+                                           "model.safetensors-%05d-of-00004.safetensors" % i) for i in range(1, 5)},
+                                       "adapter_model.safetensors": "adapter_model.safetensors"}),
+                          tokenizer=("bespokelabs/Bespoke-Nimble-9B-v2", "4b8c04d1ac2cea3e41e5e3c4d2130bcead2c0abe",
+                                     "tokenizer.json")),
         },
         "aliases": {"latest": "9b"},
         "parity": "Ollaya's Rust runtime matches the author's reference code (serving_schema.prepare_prompts and "
                   "inference.candidate_logits, PyTorch fp32 with the LoRA unmerged) on 492 questions from 104 "
                   "requests: identical token rows, the same 4 rejected requests, the same decision on every "
-                  "question, option logits within 1.1e-4 and probabilities within 6.5e-6 (CUDA).",
+                  "question, option logits within 1.1e-4 and probabilities within 6.5e-6 (CUDA). nimble:9b-v3 matches "
+                  "the author's Decision Index engine the same way on 498 questions from 105 requests (3 rejected): "
+                  "option logits within 1.4e-4, probabilities within 1.1e-5 (CUDA).",
     },
     "kev": {
         "namespace": "library",
@@ -383,6 +407,64 @@ CATALOG = {
                   "fp32, the training script's prompts) on 420 questions from 127 requests, on CPU and CUDA (RTX "
                   "4090): identical token rows, the same 121 rejected requests, the same decision on every question, "
                   "slot scores within 8.5e-5 and probabilities within 1.0e-5.",
+    },
+    "strands-decider": {
+        "namespace": "library",
+        "model": "strands-decider",
+        "family": "strands",
+        "author": "Strands Agents (adapter and pointer head) and the Qwen team (base model)",
+        "license": "Apache-2.0",
+        "license_text": ("Strands Decider by Strands Agents "
+                         "(https://huggingface.co/StrandsAgents/strands-decider-2B-qwen3.5-v1-2610)\n"
+                         "LoRA adapter and pointer head: Apache-2.0 (LICENSE.md in the model repository).\n"
+                         "Base model: Qwen3.5-2B-Base by the Qwen team (https://huggingface.co/Qwen/Qwen3.5-2B-Base), "
+                         "Apache-2.0.\nLicensed under the Apache License, Version 2.0.\n\n") + LICENSE_APACHE,
+        "tags": {
+            "2b": _wl("strands-decider-2b", "StrandsAgents/strands-decider-2B-qwen3.5-v1-2610",
+                      "216d1ccb46a9e9b036eb9187b248db98480f77d4",
+                      "Strands Decider v1 (2610): a LoRA and a pointer head on Qwen3.5-2B base. Each question is one "
+                      "row, every option scored at the end of its own line, calibrated per question type. Up to 255 "
+                      "options and 10 score levels, 4,096 tokens per row. Needs about 8 GB of memory (weights widened to fp32 at load).",
+                      "2B", 4096, ["en"], wl_dir=os.path.join(OUT, "strands-decider-2b"),
+                      weights={"model.safetensors-00001-of-00001.safetensors":
+                               ("Qwen/Qwen3.5-2B-Base", "b1485b2fa6dfa1287294f269f5fb618e03d52d7c",
+                                "model.safetensors-00001-of-00001.safetensors"),
+                               "adapter_model.safetensors": "lora/adapter_model.safetensors",
+                               "head.safetensors": "head.safetensors"}),
+        },
+        "aliases": {"latest": "2b"},
+        "parity": "Ollaya's Rust runtime matches upstream strands_decider (PyTorch fp32, the LoRA unmerged) on 650 "
+                  "questions from 152 requests: identical token rows and option positions, the same 18 rejected "
+                  "requests, the same decision on every question, option logits within 1.1e-5 and probabilities "
+                  "within 2.8e-6 (CUDA), and TypeSafe answers equal to upstream's 4-decimal rounding.",
+    },
+    "pplx-decider": {
+        "namespace": "library",
+        "model": "pplx-decider",
+        "family": "pplx",
+        "author": "Perplexity AI (post-trained model and readout) and the Qwen team (base model)",
+        "license": "Apache-2.0",
+        "license_text": ("pplx-decider-flash-v1.2 by Perplexity AI (https://huggingface.co/perplexity-ai/pplx-decider-flash-v1.2)\n"
+                         "Model, readout and code: Apache-2.0 (LICENSE and NOTICE in the model repository).\n"
+                         "Base model: Qwen3.5-4B by the Qwen team (https://huggingface.co/Qwen/Qwen3.5-4B), Apache-2.0.\n"
+                         "Licensed under the Apache License, Version 2.0.\n\n") + LICENSE_APACHE,
+        "tags": {
+            "flash": _wl("pplx-decider-flash", "perplexity-ai/pplx-decider-flash-v1.2",
+                         "6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d",
+                         "pplx-decider-flash v1.2: Qwen3.5-4B post-trained by Perplexity (distilled from its 27B decision "
+                         "models), with a 255-code readout. Every question of a request shares one sequence, read at a "
+                         "marker after each question; the full-attention layers see the whole request. Up to 255 options "
+                         "and levels, 8,192 tokens per sequence. Needs about 9 GB of memory.",
+                         "4B", 8192, ["multilingual"], wl_dir=os.path.join(OUT, "pplx-decider-flash"),
+                         weights={"model-00001-of-00002.safetensors": "model-00001-of-00002.safetensors",
+                                  "model-00002-of-00002.safetensors": "model-00002-of-00002.safetensors",
+                                  "readout.safetensors": "readout.safetensors"}),
+        },
+        "aliases": {"latest": "flash"},
+        "parity": "Ollaya's Rust runtime matches upstream pplx_decider (the reference path, PyTorch fp32) on 696 "
+                  "questions from 138 requests: identical token sequences and marker positions, the same 5 rejected "
+                  "requests, the same decision on every question, option logits within 8.2e-5 and probabilities "
+                  "within 6.8e-6 (CUDA).",
     },
     "decision": {
         "namespace": "library",

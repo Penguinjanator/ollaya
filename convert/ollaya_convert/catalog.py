@@ -6,27 +6,31 @@ refuses to run if its sha256 differs from the upstream file.
 """
 import os
 
-from .model_paths import DEFAULT_ROOT
+from .model_paths import DEFAULT_ROOT, LARGHA_ROOT
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "out")
 LICENSE_APACHE = open(os.path.join(os.path.dirname(__file__), "..", "..", "LICENSE"), encoding="utf-8").read()
 
 LAYA_REPO = "convaiinnovations/laya"
 LAYA_COMMIT = "aa8c91ca088ec597df95a0d1c76b3063cb2ae5e8"
+LARGHA_REPO = "Phocinae/Phocinae-Largha-150M-v1"
+LARGHA_COMMIT = "5300e85a7d991f4f0cdb68dc25813f76902752d4"  # tag v1.1
 
 
-def _laya(sub, description, params, ctx, languages, mlx=False):
-    """`mlx`: publish an arch layer (the tag passed its parity gate on Metal)."""
+def _laya(sub, description, params, ctx, languages, mlx=False, repo=LAYA_REPO, commit=LAYA_COMMIT,
+          root=DEFAULT_ROOT, slug=None):
+    """`mlx`: publish an arch layer (the tag passed its parity gate on Metal). `repo`, `commit` and
+    `root` name another author's laya checkpoint; `slug` then names its exports."""
     prefix = sub + "/" if sub else ""
-    slug = sub or "en"
+    slug = slug or sub or "en"
     arch = {"family": "laya", "config": prefix + "encoder/config.json",
             "agent_config": prefix + "rl_agent_config.json"} if mlx else None
     return {
-        "repo": LAYA_REPO,
-        "commit": LAYA_COMMIT,
+        "repo": repo,
+        "commit": commit,
         "weights": prefix + "model.safetensors",
         "tokenizer": prefix + "tokenizer/tokenizer.json",
-        "checkpoint": os.path.join(DEFAULT_ROOT, prefix, "model.safetensors"),
+        "checkpoint": os.path.join(root, prefix, "model.safetensors"),
         "prefix": "model.",
         "exports": {
             # fp32: the opset-23 export (fused Attention, CPU); fp16: derived from the opset-20 one.
@@ -188,6 +192,27 @@ CATALOG = {
                            "routes": {"english": "laya:en", "multilingual": "laya:multilingual"}},
             },
         },
+    },
+    "largha": {
+        "namespace": "library",
+        "model": "largha",
+        "family": "laya",
+        "author": "Phocinae",
+        "license": "Apache-2.0",
+        "license_text": "Phocinae-Largha-150M-v1 by Phocinae (https://huggingface.co/Phocinae/Phocinae-Largha-150M-v1)\n"
+                        "Licensed under the Apache License, Version 2.0. Its base encoder, jhu-clsp/mmBERT-small "
+                        "(https://huggingface.co/jhu-clsp/mmBERT-small), is MIT-licensed by JHU CLSP.\n\n"
+                        + LICENSE_APACHE,
+        "tags": {
+            "150m": _laya("", "Laya decision model on mmBERT-small, fine-tuned on the typed-decisions workflows.",
+                          "144M", 512, ["multilingual"], mlx=True, repo=LARGHA_REPO, commit=LARGHA_COMMIT,
+                          root=LARGHA_ROOT, slug="largha"),
+        },
+        "aliases": {"latest": "150m"},
+        "parity": "Ollaya's runtime matches laya's own loader (0.3.7, which renders TypeSafe questions as the 0.3.20 "
+                  "Largha was trained with) on the v1.1 checkpoint in fp32: 2,383 questions, identical token ids and "
+                  "markers, the same decision on every question, probabilities within 3.5e-6 on the CPU, CUDA and "
+                  "the Apple GPU (MLX). The fp16 graph agrees on 99.87% of decisions (3 near-ties).",
     },
     "nli": {
         "namespace": "library",
@@ -787,16 +812,19 @@ CATALOG = {
         "family": "decima",
         "author": "A. M. Madani (amyrmahdy)",
         "license": "Apache-2.0",
-        "license_text": ("Decima-small, Decima-base and Decima-agent by A. M. Madani "
-                         "(https://huggingface.co/amyrmahdy, https://github.com/amyrmahdy/decima), Apache-2.0.\n"
+        "license_text": ("Decima-small, Decima-base, Decima-agent, Decima-guard and Decima-guard-small by "
+                         "A. M. Madani (https://huggingface.co/amyrmahdy, https://github.com/amyrmahdy/decima), "
+                         "Apache-2.0.\n"
                          "Base models: multilingual-e5-small by intfloat "
-                         "(https://huggingface.co/intfloat/multilingual-e5-small) for Decima-small, and mmBERT-base "
-                         "by JHU CLSP (https://huggingface.co/jhu-clsp/mmBERT-base) for Decima-base and "
-                         "Decima-agent, both MIT License.\n"
+                         "(https://huggingface.co/intfloat/multilingual-e5-small) for Decima-small, mmBERT-base "
+                         "by JHU CLSP (https://huggingface.co/jhu-clsp/mmBERT-base) for Decima-base, Decima-agent "
+                         "and Decima-guard, and mmBERT-small by JHU CLSP "
+                         "(https://huggingface.co/jhu-clsp/mmBERT-small) for Decima-guard-small, all MIT License.\n"
                          "Licensed under the Apache License, Version 2.0.\n\n") + LICENSE_APACHE,
         # The fp32 PyTorch checkpoint under pytorch/ of each repository, the encoder and the late-interaction
-        # head in two files; the author's int8 ONNX exports are not used. The code is the GitHub tag v2.2.0
-        # (efaefe2a), which released agent 2.2; small, base and agent 2.1 were exported against v1.1.1 (2df60942).
+        # head in two files; the author's int8 ONNX exports are not used. The code is the GitHub tag v2.3.0
+        # (1b07634e), which released agent 2.3 and guard; small, base and agent 2.1 were exported against v1.1.1
+        # (2df60942), agent 2.2 against v2.2.0 (efaefe2a).
         "tags": {
             "small": _decima("decima-small", "2e7f4d0757df0215f48f2a9b2b589e1f3a6348ed",  # HF tag v1.1.1
                              "A. M. Madani's Decima-small 1.1: multilingual-e5-small with a late-interaction "
@@ -807,20 +835,34 @@ CATALOG = {
                             "A. M. Madani's Decima-base 2.0: mmBERT-base with Decima's late-interaction scorer "
                             "and ordinal head, with the author's temperature. 321M parameters, multilingual.",
                             "321M", 512),
-            # HF tag v2.2 (2026-10-08), decima.json with choice_fit (decima-late-interaction-v2); v2.1 was
-            # 86a07aab1c340fa5869bdb754e57d3851a1d288a.
-            "agent": _decima("decima-agent", "5c14a460ff368b5bf3aaf086d1ab46292d668e32",
-                             "A. M. Madani's Decima-agent 2.2: Decima-base fine-tuned for the decisions inside "
+            # HF tag v2.3, decima.json with choice_fit (decima-late-interaction-v2) and 8,192-token states; v2.2
+            # (2,048 tokens) was 5c14a460ff368b5bf3aaf086d1ab46292d668e32, v2.1 86a07aab1c340fa5869bdb754e57d3851a1d288a.
+            "agent": _decima("decima-agent", "652d90ac9d33088edd730692c95f1da381cb9174",
+                             "A. M. Madani's Decima-agent 2.3: Decima-base fine-tuned for the decisions inside "
                              "a coding agent's loop (secret and command gates, tool, command and model choice) "
-                             "and knowledge-graph judgments. States up to 2,048 tokens.",
+                             "and knowledge-graph judgments. States up to 8,192 tokens.",
+                             "321M", 8192),
+            # HF tag v1.0-preview, decima.json with choice_fit (decima-late-interaction-v2), 2,048-token states.
+            "guard": _decima("decima-guard", "98d3f734c8323cb390d9ad750e1a606a8dd56f09",
+                             "A. M. Madani's Decima-guard 1.0 preview: a guard for LLM apps on Decima-base-clean "
+                             "(mmBERT-base) that checks user messages, tool results and model replies for prompt "
+                             "injection, jailbreaks, leaks and harmful content (the OWASP Top 10 for LLM "
+                             "applications), trained for English, Arabic and Persian. 321M parameters. States up "
+                             "to 2,048 tokens.",
                              "321M", 2048),
+            "guard-small": _decima("decima-guard-small", "ac11024887d51e9b7b9522b3b8ccc2d78ce7353d",  # v1.0-preview
+                                   "A. M. Madani's Decima-guard-small 1.0 preview: Decima-guard's checks and "
+                                   "training data on mmBERT-small, for when speed matters more than the last few "
+                                   "points. 140M parameters. States up to 2,048 tokens.",
+                                   "140M", 2048),
         },
         "aliases": {"latest": "base"},
-        "parity": "Ollaya's Rust runtime matches the author's own code (decima/model.py, render.py and systemone.py, "
-                  "fp32) on 581 questions from 122 requests for each of small and base, and 591 questions from 132 "
-                  "requests for agent 2.2, ten of them too long for the option window, on CPU and CUDA (RTX 4090 and "
-                  "RTX 5090): identical token rows and truncation, the same 18 rejected requests, the same decision "
-                  "on every question, scores within 2.2e-5 and probabilities within 5.4e-6.",
+        "parity": "Ollaya's Rust runtime matches the author's own code at v2.3.0 (decima/model.py, render.py and "
+                  "systemone.py, fp32) on 599 questions from 154 requests for each of small, base, agent 2.3, guard "
+                  "and guard-small, on CPU and CUDA (RTX 4090): identical token rows and truncation, the same 18 "
+                  "rejected requests, the same decision on every question, scores within 3.2e-5 and probabilities "
+                  "within 8.2e-6. Agent's states run to 8,192 tokens: rows of 3,041, 5,986 and 8,076 tokens are "
+                  "kept whole, and one of 8,266 is truncated.",
     },
 }
 

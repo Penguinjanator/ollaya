@@ -10,17 +10,23 @@ their order cannot change the answer. Score questions go through a cumulative-li
 | Tag | Weights (fp32, `pytorch/` of the repository) | Encoder | Temperature |
 |---|---|---|---|
 | `decima:base`, `decima:latest` | `amyrmahdy/decima-base@2468005d` (Hub tag `v2.0`): `encoder/model.safetensors` (1.23 GB) and `head.safetensors` (57 MB) | `jhu-clsp/mmBERT-base` (MIT), 321M parameters | 0.7269 |
-| `decima:agent` | `amyrmahdy/decima-agent@5c14a460` (Hub tag `v2.2`): the same two files, fine-tuned from decima-base for coding-agent decisions and knowledge-graph judgments | the same | 0.7193 |
+| `decima:agent` | `amyrmahdy/decima-agent@652d90ac` (Hub tag `v2.3`): the same two files, fine-tuned from decima-base for coding-agent decisions and knowledge-graph judgments, states up to 8,192 tokens | the same | 0.6125 |
+| `decima:guard` | `amyrmahdy/decima-guard@98d3f734` (Hub tag `v1.0-preview`): the same two files, a guard for LLM apps fine-tuned from decima-base-clean | the same | 0.8051 |
+| `decima:guard-small` | `amyrmahdy/decima-guard-small@ac110248` (Hub tag `v1.0-preview`): `encoder/model.safetensors` (562 MB) and `head.safetensors`, guard's checks and training data | `jhu-clsp/mmBERT-small` (MIT), 140M parameters | 0.7546 |
 | `decima:small` | `amyrmahdy/decima-small@2e7f4d07` (Hub tag `v1.1.1`): `encoder/model.safetensors` (471 MB) and `head.safetensors` (19 MB) | `intfloat/multilingual-e5-small` (MIT), 122M parameters | 0.9356 |
 
 The temperatures are the author's, from each checkpoint's `decima.json`. The code is pinned to the GitHub tag
-`v2.2.0` (`efaefe2a`, tag object `44470b2d`), the release of decima-agent 2.2. Small, base and agent 2.1 were
-exported and checked against `v1.1.1` (`2df60942`), whose `decima/` was unchanged through `v2.0.0`; `v2.1.0`
-added `decima/render.py` (unchanged at `v2.2.0`), which changes their option rows only when the old cut makes two
-of a question's options identical (below). Decima-agent 2.2 is the first checkpoint whose `decima.json` has
-`"choice_fit": true`, so it runs on its own layout id, `decima-late-interaction-v2`: an Ollaya without the fitted
-rendering refuses it instead of cutting its options. `decima:agent` pointed at 2.1 (`86a07aab`, Hub tag `v2.1`,
-temperature 0.6082) until 2.2.
+`v2.3.0` (`1b07634e`, tag object `6e3d2b92`), the release of decima-agent 2.3 and decima-guard. Small, base and
+agent 2.1 were exported and checked against `v1.1.1` (`2df60942`), whose `decima/` was unchanged through `v2.0.0`;
+`v2.1.0` added `decima/render.py` (unchanged at `v2.2.0`), which changes their option rows only when the old cut
+makes two of a question's options identical (below). Against `v2.2.0` (`efaefe2a`), `v2.3.0` changes one line of
+`render.py` (an option's full text is kept when its token count fits, without the character shortcut) and adds an
+opt-in `"ordinal"` choice to `systemone.py`, which Ollaya does not take yet. Decima-agent 2.2 is the first
+checkpoint whose `decima.json` has `"choice_fit": true`, so it runs on its own layout id,
+`decima-late-interaction-v2`: an Ollaya without the fitted rendering refuses it instead of cutting its options.
+Agent 2.3, guard and guard-small have it too. `decima:agent` pointed at 2.1 (`86a07aab`, Hub tag `v2.1`,
+temperature 0.6082) until 2.2, and at 2.2 (`5c14a460`, Hub tag `v2.2`, temperature 0.7193, states up to 2,048
+tokens) until 2.3.
 
 The author also publishes int8 ONNX exports; Ollaya's graphs read the fp32 checkpoints instead, so that the weights
 come unmodified from the files the author's own code loads.
@@ -41,15 +47,16 @@ fitted      option_prefix + head + " … " + normalize(option)
 - **Option text** (`render.py`). `head` is the longest run of leading words of `normalize(text)` (Python's
   `str.split()`, joined by one space) with which the fitted text fits 64 tokens, found by upstream's binary
   search; with no word, the text is `option_prefix + normalize(option)`, cut if it is still too long.
-  - **v2** (`option_fit: true` in `decision.json`, the author's `choice_fit`; decima-agent 2.2): an option keeps
-    its full text when it fits 64 tokens, or when it has at most 62 characters (upstream's shortcut, which
-    assumes a token is at least one character); any other option is fitted. The full question still goes on the
-    state row.
+  - **v2** (`option_fit: true` in `decision.json`, the author's `choice_fit`; decima-agent 2.2 and 2.3, guard
+    and guard-small): an option keeps its full text when it fits 64 tokens, and any other option is fitted. Only
+    the token count decides (`v2.3.0`; `v2.2.0` also kept any text of at most 62 characters, assuming a token is
+    at least one character). The full question still goes on the state row.
   - **v1** (small, base, agent 2.1): every option keeps its full text, cut on the right as before, unless two of
     the question's cut rows come out identical (a long question pushes every option out of the window, and
     `yes` and `no` tie at 0.5). Then that question's options are rendered as in v2.
 - **Per model** (`decision.json`): small uses e5's prefixes `query: ` and `passage: `, `[cls]` 0 and `[sep]` 2;
-  base and agent use no prefix, `<bos>` 2 and `<eos>` 1. `max_state_tokens` is 512, and 2,048 for agent.
+  base, agent and the guards use no prefix, `<bos>` 2 and `<eos>` 1. `max_state_tokens` is 512 for small and
+  base, 8,192 for agent 2.3 (2,048 for 2.2) and 2,048 for guard and guard-small.
 - **Text.** The question's instructions: a string as is, anything else as `json.dumps(ensure_ascii=False)`,
   the question id when they are absent or null. A noul question whose criteria give a `true` or `false`
   description appends `\nTrue if: ...\nFalse if: ...`, with U+2014 for the side without one.
@@ -75,9 +82,11 @@ Outside `fit_cases`, only one question of the set (an extra case with a 444-char
 over 64 tokens, and its options stay apart, so the older models' rows there are the same as with `v1.1.1`. In
 `fit_cases` the right-hand cut collapses 8 of the 10 questions for small and 7 for base and agent; with the
 fallback, 8 of them get new rows for small and 6 for base and agent 2.1. Agent 2.2 fits 8 of them and the
-long-option case, whether or not they collapse. One collapse stays: 40 Egyptian hieroglyphs and `yes`/`no` are 45
-characters but over 64 mmBERT tokens, so upstream's character shortcut keeps the full text and both rows are cut
-to the same tokens (noul 0.5), with and without `choice_fit`. The port does the same.
+long-option case, whether or not they collapse. Up to `v2.2.0` one collapse stayed: 40 Egyptian hieroglyphs and
+`yes`/`no` are 45 characters but over 64 mmBERT tokens, so the character shortcut kept the full text and both rows
+were cut to the same tokens (noul 0.5), with and without `choice_fit`. `v2.3.0` checks the token count only, so
+for every model these options are fitted like any other; no other question of the set has a full option text of
+62 characters or fewer over 64 tokens. The port follows `v2.3.0`.
 
 ## The graph
 
@@ -130,6 +139,25 @@ Goldens: `python -m ollaya_convert.families.decima.goldens out/<slug>` runs the 
 `systemone.py` in fp32 on the CPU. `parity_decima` checks the rejections and every row id for id, then the graph's
 outputs, the decisions and the `/v1/systemone` answers against upstream's `system_one`. On CPU the ONNX Runtime is
 pyke's 1.28.0, linked statically; on CUDA it is Microsoft's 1.28.2 from the CUDA 13 pack.
+
+**Decima 2.3 (measured 2026-10-20).** Upstream `v2.3.0` (`1b07634e`): 154 requests per model, the 150 below and four
+long agent states (3,041, 5,986, 8,076 and 8,266 tokens), 18 rejected upstream. Cut states: 7 for small and base,
+1 for agent (the 8,266-token one), 4 for guard and guard-small.
+
+| Model | Device | Questions | Rows | Decisions | Scores max | Probabilities max |
+|---|---|---|---|---|---|---|
+| small 1.1 | x86-64 CPU | 599 | 2,986 identical | 599/599 | 1.2e-5 | 2.2e-6 |
+| small 1.1 | CUDA, RTX 4090 | 599 | 2,986 identical | 599/599 | 1.1e-5 | 1.8e-6 |
+| base 2.0 | x86-64 CPU | 599 | 2,986 identical | 599/599 | 2.0e-5 | 3.8e-6 |
+| base 2.0 | CUDA, RTX 4090 | 599 | 2,986 identical | 599/599 | 1.0e-5 | 3.5e-6 |
+| agent 2.3 | x86-64 CPU | 599 | 2,986 identical | 599/599 | 1.9e-5 | 5.4e-6 |
+| agent 2.3 | CUDA, RTX 4090 | 599 | 2,986 identical | 599/599 | 3.2e-5 | 8.2e-6 |
+| guard 1.0 preview | x86-64 CPU | 599 | 2,986 identical | 599/599 | 1.8e-5 | 5.8e-6 |
+| guard 1.0 preview | CUDA, RTX 4090 | 599 | 2,986 identical | 599/599 | 2.0e-5 | 7.3e-6 |
+| guard-small 1.0 preview | x86-64 CPU | 599 | 2,986 identical | 599/599 | 1.8e-5 | 7.5e-6 |
+| guard-small 1.0 preview | CUDA, RTX 4090 | 599 | 2,986 identical | 599/599 | 9.1e-6 | 4.8e-6 |
+
+The ordinal projections are within 9.9e-5, and every `/v1/systemone` answer matches upstream's to 4 decimals.
 
 **Decima-agent 2.2 (measured 2026-10-13).** Upstream `v2.2.0`: 150 requests, the 140 below and the 10
 `fit_cases`, 18 rejected upstream.
@@ -211,10 +239,11 @@ Ollaya runs fp32 and encodes the options on every request.
 
 ## Limits
 
-- **State.** 512 tokens per question for small and base, 2,048 for agent, the question's text included.
+- **State.** 512 tokens per question for small and base, 8,192 for agent and 2,048 for guard and guard-small,
+  the question's text included.
   Longer: `/v1/systemone` answers `STATE_TRUNCATED`, `/api/decide` answers from the first tokens.
-- **Options.** Each option row holds the question's text and the option in 64 tokens. Agent 2.2 keeps the option
-  whole and shortens the question beside it; small and base keep the right-hand cut their training saw, unless it
+- **Options.** Each option row holds the question's text and the option in 64 tokens. Agent and the guards keep
+  the option whole and shorten the question beside it; small and base keep the right-hand cut their training saw, unless it
   makes two options identical (above). An option alone over 64 tokens is still cut. 2 to 255 choices, 2 to 10
   score levels, 1 to 256 questions.
 - **Languages.** Multilingual. For small the author evaluated 20 languages (the weakest are Swahili and Hindi);

@@ -63,10 +63,10 @@
     },
     {
       "mediaType": "application/vnd.ollaya.license",
-      "digest": "sha256:d2a0668879d4cc53f7d26ad1913337300537c0e7e8d8bc739c7837946d27f14b",
-      "size": 10613,
+      "digest": "sha256:6e583cb7b1fd1e71700cd26f4d83d80ba9e61df69718948429bc487a93310b44",
+      "size": 10756,
       "urls": [
-        "https://ollaya.dev/blobs/sha256-d2a0668879d4cc53f7d26ad1913337300537c0e7e8d8bc739c7837946d27f14b"
+        "https://ollaya.dev/blobs/sha256-6e583cb7b1fd1e71700cd26f4d83d80ba9e61df69718948429bc487a93310b44"
       ]
     }
   ]

@@ -8,7 +8,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { homedir, tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 
-export const OWL = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5.5 10.5 9.5Q16 7.5 21.5 9.5L26 5.5V19Q26 27.5 16 27.5T6 19Z"/><circle cx="11.5" cy="15.5" r="3.25"/><circle cx="20.5" cy="15.5" r="3.25"/><circle cx="11.5" cy="15.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="20.5" cy="15.5" r="1.1" fill="currentColor" stroke="none"/><path d="M14.75 21 16 23l1.25-2"/></svg>`
+export const OWL = `<svg viewBox="0 0 32 32"><circle cx="9.5" cy="16" r="6.5" fill="none" stroke="currentColor" stroke-width="3.2"/><circle cx="22.5" cy="16" r="6.5" fill="none" stroke="currentColor" stroke-width="3.2"/><circle cx="22.5" cy="16" r="2.6" fill="currentColor"/></svg>`
 
 export const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
 
@@ -40,8 +40,8 @@ export function page(fonts, body, css = '') {
     font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
   .card { position: relative; width: 1200px; height: 630px; padding: 64px 72px; display: flex; flex-direction: column; }
   .glow { position: absolute; inset: 0; pointer-events: none;
-    background: radial-gradient(640px 360px at 100% 0%, rgba(121,192,255,.13), transparent 70%),
-                radial-gradient(520px 300px at 0% 100%, rgba(126,226,168,.08), transparent 70%); }
+    background: radial-gradient(640px 360px at 100% 0%, rgba(217,179,102,.12), transparent 70%),
+                radial-gradient(520px 300px at 0% 100%, rgba(143,211,174,.12), transparent 70%); }
   .grid { position: absolute; inset: 0; pointer-events: none; opacity: .5;
     background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
     background-size: 48px 48px; mask-image: radial-gradient(900px 500px at 80% 10%, #000 20%, transparent 75%); }
@@ -53,12 +53,15 @@ export function page(fonts, body, css = '') {
   .badge { display: inline-block; font-size: 18px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
     color: #79c0ff; border: 1px solid rgba(121,192,255,.35); background: rgba(121,192,255,.08); border-radius: 999px; padding: 6px 16px; }
   h1 { font-size: 84px; line-height: 1.02; font-weight: 500; letter-spacing: -.035em; }
-  h1.model { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 112px; letter-spacing: -.04em; margin-top: 22px; }
-  .text { margin-top: 22px; max-width: 980px; font-size: 32px; line-height: 1.35; color: #a3a3a3; letter-spacing: -.01em; }
+  h1.model { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 112px; letter-spacing: -.04em; }
+  .stats { display: flex; gap: 56px; margin-top: 28px; }
+  .stats b { display: block; font-size: 52px; font-weight: 600; letter-spacing: -.03em; color: #8fd3ae; font-variant-numeric: tabular-nums; }
+  .stats span { display: block; margin-top: 2px; font-size: 20px; color: #8a8a8a; }
+  .text { margin-top: 18px; max-width: 980px; font-size: 30px; line-height: 1.35; color: #a3a3a3; letter-spacing: -.01em; }
   .bottom { position: relative; margin-top: 44px; display: flex; align-items: center; justify-content: space-between; }
-  .cmd { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 26px; background: #141414; border: 1px solid #262626;
-    border-radius: 14px; padding: 16px 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
-  .p { color: #7ee2a8; } .c { color: #ffc36b; }
+  .cmd { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 34px; background: #141414; border: 1px solid #2a2a2a;
+    border-radius: 12px; padding: 18px 28px; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+  .p { color: #8fd3ae; } .c { color: #d9b366; }
   .meta { font-size: 22px; color: #8a8a8a; text-align: right; line-height: 1.5; }
   .meta b { color: #d4d4d4; font-weight: 500; }
 ${css}
@@ -93,7 +96,8 @@ export async function renderCards(cards, out) {
       await mkdir(dirname(target), { recursive: true })
       const r = spawnSync(
         bin,
-        ['--no-sandbox', '--hide-scrollbars', '--force-device-scale-factor=1', '--window-size=1200,630', '--virtual-time-budget=5000', `--screenshot=${target}`, `file://${html}`],
+        // Headless with its own profile, so a Chrome the user has open is not asked to take the shot (it would silently not).
+        ['--headless=new', `--user-data-dir=${join(tmp, 'profile')}`, '--no-sandbox', '--hide-scrollbars', '--force-device-scale-factor=1', '--window-size=1200,630', '--virtual-time-budget=5000', `--screenshot=${target}`, `file://${html}`],
         { encoding: 'utf8' },
       )
       if (r.status !== 0 || !existsSync(target)) throw new Error(`rendering ${card.file} failed:\n${r.stderr}`)

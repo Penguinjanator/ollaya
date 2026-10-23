@@ -94,7 +94,7 @@ interface Page {
 /** Every HTML page of the site. Also the sitemap, in this order. */
 function pages(origin: string): Page[] {
   const list: Page[] = [
-    { url: '/', meta: { jsonLd: softwareJsonLd(origin) }, render: () => <HomePage /> },
+    { url: '/', meta: { jsonLd: softwareJsonLd(origin), fullBleed: true }, render: () => <HomePage origin={origin} /> },
     {
       url: '/search',
       meta: {

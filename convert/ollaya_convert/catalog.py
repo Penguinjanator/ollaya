@@ -317,7 +317,8 @@ CATALOG = {
             "2b": _wl("decider-2b", "Mapika/decider-2b", "9839cc9d908be16c5988c0d041034b5fdf82c7a2",
                       "Decoder decision model (Qwen3.5-2B base): reads option-letter logits at an answer slot. "
                       "Highest accuracy of the open models Ollaya ships.",
-                      "1.9B", 32768, ["en"], wl_dir=os.path.join(OUT, "decider-2b")),
+                      "1.9B", 32768, ["en"], wl_dir=os.path.join(OUT, "decider-2b"),
+                      arch={"family": "tied-rows", "config": "config.json"}),
             # v5 text weights in the Qwen3.5-2B vision-language model: `decider-vision-v1`, two graphs
             # (vision.onnx, the image tower; model.onnx, the decoder with M-RoPE positions).
             "2b-vision": _wl("decider-2b-vision", "Mapika/decider-2b-vision", "863e290863655f1d6b69324d77d09ac972d21609",
@@ -327,7 +328,8 @@ CATALOG = {
                              "2.2B", 32768, ["en"], wl_dir=os.path.join(OUT, "decider-2b-vision")),
             "0.8b": _wl("decider-0.8b", "Mapika/decider-0.8b", "a0a01d6f8135298f400a8c856b355793012ae971",
                         "Smaller decider (Qwen3.5-0.8B base): faster, less accurate.",
-                        "0.75B", 32768, ["en"], wl_dir=os.path.join(OUT, "decider-0.8b")),
+                        "0.75B", 32768, ["en"], wl_dir=os.path.join(OUT, "decider-0.8b"),
+                        arch={"family": "tied-rows", "config": "config.json"}),
         },
         "aliases": {"latest": "2b"},
         "parity": "Ollaya's Rust runtime matches the Python reference exactly on 479 questions (902 rows) "
@@ -566,7 +568,8 @@ CATALOG = {
             "0.6b": _wl("qwen3guard-gen-0.6b", "Qwen/Qwen3Guard-Gen-0.6B", "fada3b2f655b89601929198343c94cd2f64d93cc",
                         "Safety guard (Qwen3Guard-Gen-0.6B) with built-in questions: safe, controversial or unsafe, "
                         "and the unsafe category.",
-                        "0.6B", 32768, ["multilingual"], wl_dir=os.path.join(OUT, "qwen3guard-gen-0.6b")),
+                        "0.6B", 32768, ["multilingual"], wl_dir=os.path.join(OUT, "qwen3guard-gen-0.6b"),
+                        arch={"family": "tied-rows", "config": "config.json"}),
         },
         "aliases": {"latest": "0.6b"},
         "parity": "Ollaya's Rust runtime matches the transformers fp32 reference exactly on 74 texts (148 rows, "

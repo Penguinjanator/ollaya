@@ -10,9 +10,33 @@ import argparse
 import os
 import shutil
 
+import numpy as np
 import onnx
+from onnx import numpy_helper
 from onnxruntime.transformers.float16 import convert_float_to_float16
 from onnxruntime.transformers.onnx_model import OnnxModel
+
+
+def weight_bytes(model):
+    """The initializers' size; `ByteSize()` itself fails on a model past protobuf's 2 GB."""
+    return sum(len(t.raw_data) for t in model.graph.initializer)
+
+
+def to_fp16(model, keep_fp32=()):
+    kw = {"op_block_list": list(keep_fp32)} if keep_fp32 else {}
+    # The converter moves values below fp16's smallest subnormal to ±5.96e-8, which keeps a small constant such as an
+    # epsilon non-zero. A weight gets a plain cast instead: the registry ships the fp32 checkpoint plus a Cast node
+    # (weightless.py), which rounds such values to 0, and checks that it reproduces this graph exactly.
+    plain = {t.name: numpy_helper.to_array(t).astype(np.float16) for t in model.graph.initializer
+             if t.data_type == onnx.TensorProto.FLOAT and np.prod(t.dims) > 4096}
+    # The converter's shape inference serializes the model, which protobuf caps at 2 GB (fp32 weights of
+    # a 1B-parameter encoder); such a graph is converted without it, and its fp16 parity gate checks the result.
+    big = weight_bytes(model) > 2**31 - 2**24
+    model = convert_float_to_float16(model, keep_io_types=True, disable_shape_infer=big, **kw)
+    for i, t in enumerate(model.graph.initializer):
+        if t.name in plain and t.data_type == onnx.TensorProto.FLOAT16:
+            model.graph.initializer[i].CopyFrom(numpy_helper.from_array(plain[t.name], t.name))
+    return model
 
 
 def main():
@@ -23,8 +47,7 @@ def main():
     a = ap.parse_args()
 
     model = onnx.load(os.path.join(a.src, "model.onnx"), load_external_data=True)
-    kw = {"op_block_list": [o for o in a.keep_fp32.split(",") if o]} if a.keep_fp32 else {}
-    model = convert_float_to_float16(model, keep_io_types=True, **kw)
+    model = to_fp16(model, [o for o in a.keep_fp32.split(",") if o])
     # The converter appends its Cast nodes out of order; ONNX requires a topologically sorted graph.
     wrapped = OnnxModel(model)
     wrapped.topological_sort()
@@ -34,7 +57,7 @@ def main():
     del model.graph.value_info[:]
     os.makedirs(a.dst, exist_ok=True)
     out = os.path.join(a.dst, "model.onnx")
-    if model.ByteSize() < 2**31 - 2**24:
+    if weight_bytes(model) < 2**31 - 2**24:
         onnx.save(model, out)
     else:
         onnx.save(model, out, save_as_external_data=True, location="model.onnx.data")

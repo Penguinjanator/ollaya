@@ -8,11 +8,11 @@
     "url": "https://github.com/ollaya-dev/ollaya",
     "source": "github"
   },
-  "version": "0.17.0",
+  "version": "0.18.0",
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/ollaya-dev/ollaya:0.17.0",
+      "identifier": "ghcr.io/ollaya-dev/ollaya:0.18.0",
       "transport": {
         "type": "stdio"
       },

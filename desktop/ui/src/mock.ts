@@ -86,7 +86,7 @@ const guardQuestions: Questions = {
 const builtin = (model: string) => (model.startsWith('qwen3guard') ? guardQuestions : null)
 
 export function mock(): Backend {
-  let status: Status = { running: true, version: '0.17.0', url: 'http://127.0.0.1:11435', device: null }
+  let status: Status = { running: true, version: '0.18.0', url: 'http://127.0.0.1:11435', device: null }
   let local: LocalModel[] = [
     { name: 'laya:latest', size: 11_000 },
     { name: 'laya:en', size: 854_000_000 },
@@ -109,7 +109,7 @@ export function mock(): Backend {
   const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
   return {
     status: async () => status,
-    startServer: async () => ((status = { ...status, running: true, version: '0.17.0' }), status),
+    startServer: async () => ((status = { ...status, running: true, version: '0.18.0' }), status),
     stopServer: async () => ((status = { ...status, running: false, version: null }), status),
     // Preview only: #offline fails as the app does without a connection.
     library: async () => {

@@ -1,5 +1,6 @@
-//! Compare the `decision-endpoint-v1` runtime against golden fixtures from
-//! `ollaya_convert.families.decision.goldens` (the author's code in fp32, TF32 off, exact SDPA).
+//! Compare the `decision-endpoint-v1` and `decision2-endpoint-v1` runtime against golden fixtures from
+//! `ollaya_convert.families.decision.goldens` and `decision2.goldens` (the author's code in fp32, TF32
+//! off, exact SDPA).
 //!
 //!     cargo run --release -p ollaya-runner --example parity_decision -- <model-dir> <goldens.jsonl> [cpu|cuda|metal] [--latency] [--smoke]
 //!
@@ -14,7 +15,10 @@
 //! * calibrated probabilities must pick the reference's option (max / p99 difference reported);
 //! * the TypeSafe answers must match the author's `typed_answer` (choice, noul, expected score,
 //!   confidence, legend and probabilities). Ollaya rounds wire numbers to 4 decimals and the author
-//!   does not, so they may differ by half a step.
+//!   does not, so they may differ by half a step. Decision 2.0's author reports the entropy
+//!   confidence, 1 − H(p)/log K, so for it the check reads that instead of TypeSafe's (which
+//!   `/v1/systemone` returns for every model), and it writes a non-text score level into the
+//!   legend as canonical JSON text, where Ollaya returns the level verbatim.
 //!
 //! `--latency` then times full requests (`run`: tokenize, encode, forward) of 5 questions.
 
@@ -23,6 +27,9 @@ use std::path::PathBuf;
 use std::time::Instant;
 
 use anyhow::{Context, Result, bail};
+use ollaya_decision::answer::round4;
+use ollaya_decision::decision::PROMPT_VERSION_2;
+use ollaya_decision::pyjson::dumps_canonical;
 use ollaya_decision::{Answer, Questions};
 use ollaya_runner::Device;
 use ollaya_runner::decision::{DecisionEncoding, DecisionModel};
@@ -244,6 +251,8 @@ fn main() -> Result<()> {
     }
 
     // Numbers: option logits, calibrated probabilities, wire answers.
+    // Decision 2.0's author renders answers its own way; compare in its terms (module docs).
+    let decision2 = model.layout.prompt_version == PROMPT_VERSION_2;
     let (mut logit_max, mut wire_max, mut disagree, mut wire_bad) = (0f64, 0f64, 0, 0);
     let mut prob_diffs = Vec::new();
     let mut forward = 0f64;
@@ -283,15 +292,23 @@ fn main() -> Result<()> {
                 }
             }
             let upstream = &case.rec["answers"][qid.as_str()];
-            match wire_diff(&answer.to_typesafe(q), upstream) {
+            let mut ours = answer.to_typesafe(q);
+            if decision2 && ours.get("confidence").is_some() {
+                ours["confidence"] = round4(answer.entropy_confidence()).into();
+            }
+            if let (true, Some(legend)) = (decision2, ours["legend"].as_object_mut()) {
+                for v in legend.values_mut().filter(|v| !v.is_string()) {
+                    *v = dumps_canonical(v).into();
+                }
+            }
+            match wire_diff(&ours, upstream) {
                 Some(d) => wire_max = wire_max.max(d),
                 None => {
                     wire_bad += 1;
                     if wire_bad <= 5 {
                         println!(
-                            "ANSWER {} {qid}: {} vs the author's {upstream}",
-                            case.id,
-                            answer.to_typesafe(q)
+                            "ANSWER {} {qid}: {ours} vs the author's {upstream}",
+                            case.id
                         );
                     }
                 }

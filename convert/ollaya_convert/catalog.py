@@ -53,9 +53,10 @@ def _laya(sub, description, params, ctx, languages, mlx=False, repo=LAYA_REPO, c
     }
 
 
-def _gguf(export, repo, commit, gguf, description, params, languages, notice=None):
+def _gguf(export, repo, commit, gguf, description, params, languages, notice=None, tokenizer=None):
     """A GGUF model run by llama.cpp: the author's GGUF, unmodified, plus the decision.json and
-    calibration.json that `llm_common/export_llama.py` derived from it (`out/<export>`)."""
+    calibration.json that `llm_common/export_llama.py` derived from it (`out/<export>`). `tokenizer`: the
+    author's tokenizer.json in `repo`, for a layout that renders with it instead of the GGUF's vocabulary."""
     return {
         "kind": "gguf",
         "repo": repo,
@@ -66,6 +67,7 @@ def _gguf(export, repo, commit, gguf, description, params, languages, notice=Non
         "languages": languages,
         "description": description,
         "notice": notice,
+        "tokenizer": tokenizer,
     }
 
 
@@ -1068,6 +1070,44 @@ CATALOG = {
         "parity": "Ollaya's runner matches stock llama-server of the pinned build (b11146) on the same GGUF, "
                   "CUDA (RTX 4090): 593 questions, every decision the same, option logits within 7.7e-6 and "
                   "probabilities within 1.6e-6. The prompts are byte-identical to the author's jevk5.prompt.",
+    },
+    "jev-style": {
+        "namespace": "library",
+        "model": "jev-style",
+        "family": "jev-style",
+        "author": "chaoliangUNSW",
+        "license": "Apache-2.0",
+        "license_text": "Jev-Style by chaoliangUNSW (https://huggingface.co/chaoliangUNSW), a fine-tune of "
+                        "Qwen3.5-2B by the Qwen team (Apache-2.0). Its render v2 input and verdict readout "
+                        "are the author's.\n"
+                        "Licensed under the Apache License, Version 2.0.\n\n" + LICENSE_APACHE,
+        "tags": {
+            # Jev-Style-2B-Decision-v3. The GGUF holds the weights and the readout tokens (' yes' 9542,
+            # ' no' 874, ' ->' 1411); the render uses the author's tokenizer.json, which the runtime the
+            # author measured uses (llama.cpp's own pre-tokenizer splits some scripts, e.g. Devanagari and
+            # Arabic, differently). Q8_0 is the default: the card puts Q4_K_M at 95.7 % top-1 agreement with
+            # fp32 and calls it noisier on long inputs.
+            "2b": _gguf("jev-style-2b-q8_0", "chaoliangUNSW/Jev-Style-2B-Decision-v3-GGUF",
+                        "283b9eb7903aeb184b16d49ab8f38b256f4afcb3",
+                        "Jev-Style-2B-Decision-v3-Q8_0.gguf",
+                        "Jev-Style-2B-Decision-v3 (Qwen3.5-2B fine-tune), Q8_0 GGUF on llama.cpp: a "
+                        "non-causal block-attention decision model, the verdict readout logit(' yes') - "
+                        "logit(' no') at each option's ' ->' slot, with the author's global temperature 0.828. "
+                        "No option cap; up to 25,600 input tokens.",
+                        "2B", ["en"], tokenizer="tokenizer/tokenizer.json"),
+            "2b-q4_k_m": _gguf("jev-style-2b-q4_k_m", "chaoliangUNSW/Jev-Style-2B-Decision-v3-GGUF",
+                               "283b9eb7903aeb184b16d49ab8f38b256f4afcb3",
+                               "Jev-Style-2B-Decision-v3-Q4_K_M.gguf",
+                               "Jev-Style-2B-Decision-v3, Q4_K_M GGUF (1.3 GB): the smaller download, 95.7 % "
+                               "top-1 agreement with fp32 by the author's measurement and noisier on long inputs.",
+                               "2B", ["en"], tokenizer="tokenizer/tokenizer.json"),
+        },
+        "aliases": {"latest": "2b"},
+        "parity": "Ollaya's runner matches the author's own jev-score-v2 (unchanged, on the pinned llama.cpp build "
+                  "b11146) on the same GGUF and device: 582 questions per file, identical token ids, verdict slots "
+                  "and attention blocks, every decision the same and verdict scores within 4.4e-16 (Q8_0 and "
+                  "Q4_K_M; x86-64 CPU on a community machine, and CUDA on an RTX 5090). The render is identical "
+                  "to the author's jev_style_decision_gguf.py on the author's tokenizer.",
     },
     "decima": {
         "namespace": "library",

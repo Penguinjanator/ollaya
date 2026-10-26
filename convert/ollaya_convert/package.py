@@ -252,6 +252,8 @@ def package_gguf(spec, tag, v, blobs):
     }, indent=2).encode())
     print("  %s:%s %s %.2f GB (%s)" % (spec["model"], tag, pin["quantization"], gguf["size"] / 1e9, v["gguf"]))
     layers = [gguf, decision, calibration, lic]
+    if v.get("tokenizer"):  # the author's tokenizer.json, for a layout that renders with it (jev-style)
+        layers.append(upstream(MEDIA["tokenizer"], repo, commit, v["tokenizer"]))
     if v.get("mmproj"):  # a path in `repo`, or `(repo, commit, path)` for the author's file elsewhere
         m = v["mmproj"]
         layers.append(upstream(MEDIA["mmproj"], *(m if isinstance(m, tuple) else (repo, commit, m))))

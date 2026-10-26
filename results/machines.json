@@ -75,5 +75,16 @@
   "source": "https://github.com/ollaya-dev/ollaya/pull/33",
   "kind": "community",
   "headline": "RX 9070"
+ },
+ "community-epyc-milan": {
+  "label": "AMD EPYC Milan cloud VM, 8 vCPUs (community)",
+  "cpu": "AMD EPYC (Milan), 8 vCPUs under KVM",
+  "gpus": [],
+  "ram_gb": 16,
+  "os": "Ubuntu 26.04",
+  "by": "mirfan-cof",
+  "source": "https://github.com/ollaya-dev/ollaya/pull/77",
+  "kind": "community",
+  "headline": "EPYC Milan VM"
  }
 }

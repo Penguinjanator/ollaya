@@ -30,6 +30,8 @@ pub struct RunnerFiles {
 #[derive(Debug, Clone, PartialEq)]
 pub struct LlamaFiles {
     pub mmproj: Option<PathBuf>,
+    /// The author's `tokenizer.json`, for a layout that renders with it (jev-style).
+    pub tokenizer: Option<PathBuf>,
     pub gguf: PathBuf,
     pub decision: PathBuf,
     /// The GGUF's type (`Q4_0`), from the layer's annotation.
@@ -135,6 +137,10 @@ pub fn resolve_entry(store: &Store, entry: Entry) -> Result<Resolved, Error> {
         let files = EngineFiles::Llama(LlamaFiles {
             mmproj: manifest
                 .layer(media::MMPROJ)
+                .map(|d| store.blob_path(&d.digest))
+                .transpose()?,
+            tokenizer: manifest
+                .layer(media::TOKENIZER)
                 .map(|d| store.blob_path(&d.digest))
                 .transpose()?,
             gguf: blob(media::GGUF)?,

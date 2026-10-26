@@ -1,0 +1,41 @@
+{
+ "schema": 1,
+ "suite": "parity",
+ "date": "2026-10-26",
+ "machine": "community-epyc-milan",
+ "device": "cpu",
+ "ollaya": "0.18.0 at cf1fa64",
+ "protocol": {
+  "reference": "goldens from each family's goldens.py: the authors' code in PyTorch fp32 (TF32 off) on the checkpoint the manifest names",
+  "gate": "fp32 tags: identical encodings and decisions, option logits within 1e-3, wire answers as the authors' code; -fp16 tags (docs/decisions/0008-fp16-decoder-tags.md): identical encodings, at least 99.5 % of decisions the same, differences reported",
+  "runner": "convert/ollaya_convert/parity_run.py with crates/ollaya-runner/examples/parity_<family>.rs"
+ },
+ "results": [
+  {
+   "model": "jev-style:2b",
+   "questions": 582,
+   "decisions_same": 582,
+   "max_logit_diff": 4.440892098500626e-16,
+   "max_prob_diff": 0.0,
+   "p99_prob_diff": 0.0,
+   "pass": true,
+   "device": "cpu",
+   "kind": "runtime",
+   "gate": "fp32",
+   "export_sha256": "f4826516125022362f4617e16d28b0e5f95b10d053bac18b59f49f27c89c83bb"
+  },
+  {
+   "model": "jev-style:2b-q4_k_m",
+   "questions": 582,
+   "decisions_same": 582,
+   "max_logit_diff": 4.440892098500626e-16,
+   "max_prob_diff": 0.0,
+   "p99_prob_diff": 0.0,
+   "pass": true,
+   "device": "cpu",
+   "kind": "runtime",
+   "gate": "fp32",
+   "export_sha256": "a0140af1710ccff8c00e7e911b1ec0697467a023fcdb3ffde6408dd474d5e124"
+  }
+ ]
+}

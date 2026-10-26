@@ -504,6 +504,9 @@ impl Scheduler {
                 if let Some(mmproj) = &f.mmproj {
                     cmd.arg("--mmproj").arg(mmproj);
                 }
+                if let Some(tokenizer) = &f.tokenizer {
+                    cmd.arg("--tokenizer").arg(tokenizer);
+                }
                 cmd.arg("--gguf")
                     .arg(&f.gguf)
                     .arg("--decision")

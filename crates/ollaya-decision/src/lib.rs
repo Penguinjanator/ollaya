@@ -21,6 +21,7 @@ pub mod gliclass;
 pub mod gliclass_kv;
 pub mod jebadiah;
 pub mod jeeves;
+pub mod jev_style;
 pub mod jevk5;
 pub mod kev;
 pub mod layout;

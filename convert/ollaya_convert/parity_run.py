@@ -9,8 +9,9 @@ code (the gate) and the sha256 of the graph it checked go into `results/runs/<da
 one file per day, machine and device; a tag checked again that day replaces its row. `bench_plan` reads these files
 to find the parity result of a changed graph.
 
-Only the examples that print a `record:` line can be recorded (the Qwen3.5 families today); add the line to an
-example when its family is next touched. A CUDA run needs the CUDA libraries on LD_LIBRARY_PATH, as any CUDA parity run.
+Only the examples that print a `record:` line can be recorded (the Qwen3.5 families today, and jev-style among the
+GGUF families: `GGUF_RECORDED`); add the line to an example when its family is next touched. A GGUF example needs
+OLLAYA_LIBRARY_PATH (an install's lib/ollaya), as when it is run directly. A CUDA run needs the CUDA libraries on LD_LIBRARY_PATH, as any CUDA parity run.
 On an RTX 50-series GPU (sm_120), which pyke's CUDA build has no kernels for, pass `--cuda-dynamic <pack dir>`: the
 example is built with `cuda-dynamic` and loads Microsoft's ONNX Runtime from a GPU pack's `cuda_v13`, as the release's
 CUDA runner does (docs/decisions/0004-cuda-onnxruntime-builds.md).
@@ -40,6 +41,9 @@ PROTOCOL = {
 }
 # Families that run on another family's engine, and so on its parity example.
 EXAMPLE = {"d3": "pplx", "decision2": "decision"}
+# GGUF families whose example prints a `record:` line. Their goldens are per device, in the export directory
+# (`goldens-<device>.jsonl`, from the family's goldens.py), and the export is pinned by the GGUF's sha256.
+GGUF_RECORDED = {"jev-style"}
 
 
 def wl_tags():
@@ -50,6 +54,20 @@ def wl_tags():
             if v.get("kind") == "wl":
                 out["%s:%s" % (e["model"], t)] = (e["family"], os.path.normpath(v["wl_dir"]))
     return out
+
+
+def gguf_tags():
+    """tag -> (family, export directory) for every GGUF tag whose family's example can be recorded."""
+    return {"%s:%s" % (e["model"], t): (e["family"], os.path.normpath(v["export_dir"]))
+            for e in CATALOG.values() if e["family"] in GGUF_RECORDED
+            for t, v in e["tags"].items() if v.get("kind") == "gguf"}
+
+
+def gguf_command(family, d, device):
+    """The cargo command that runs a GGUF family's parity example on its goldens for `device`."""
+    example = "parity_" + family.replace("-", "_")
+    cmd = ["cargo", "run", "--release", "-q", "-p", "ollaya-runner", "--example", example]
+    return cmd + ["--", d, os.path.join(d, "goldens-%s.jsonl" % device), device], "fp32"
 
 
 def command(family, d, device, cuda_dynamic=None):
@@ -76,6 +94,8 @@ def parse(tag, stdout, returncode):
 
 
 def export_sha256(d):
+    if not os.path.exists(os.path.join(d, "model.onnx")):  # a GGUF export: the author's file, by its pin
+        return json.load(open(os.path.join(d, "decision.json"), encoding="utf-8"))["gguf"]["sha256"]
     with open(os.path.join(d, "model.onnx"), "rb") as f:
         return hashlib.file_digest(f, "sha256").hexdigest()
 
@@ -115,10 +135,11 @@ def main():
     if a.cuda_dynamic:
         env["ORT_DYLIB_PATH"] = os.path.join(a.cuda_dynamic, "libonnxruntime.so.1")
         env["LD_LIBRARY_PATH"] = os.pathsep.join(p for p in (a.cuda_dynamic, env.get("LD_LIBRARY_PATH")) if p)
-    known = wl_tags()
-    unknown = [t for t in a.tags if t not in known]
+    known, gguf = wl_tags(), gguf_tags()
+    unknown = [t for t in a.tags if t not in known and t not in gguf]
     if unknown:
-        sys.exit("not converted under families/ (catalog.py kind 'wl'): %s" % " ".join(unknown))
+        sys.exit("not converted under families/ (catalog.py kind 'wl') nor a recorded GGUF family (%s): %s"
+                 % (", ".join(sorted(GGUF_RECORDED)), " ".join(unknown)))
     if a.machine not in json.load(open(os.path.join(RESULTS, "machines.json"), encoding="utf-8")):
         sys.exit("%s is not in results/machines.json; add the machine first" % a.machine)
 
@@ -126,8 +147,12 @@ def main():
     path = os.path.join(RESULTS, "runs", "%s-parity-%s-%s.json" % (date, a.machine.replace("-", ""), a.device))
     failed = []
     for tag in a.tags:
-        family, d = known[tag]
-        cmd, gate = command(family, d, a.device, a.cuda_dynamic)
+        if tag in gguf:
+            family, d = gguf[tag]
+            cmd, gate = gguf_command(family, d, a.device)
+        else:
+            family, d = known[tag]
+            cmd, gate = command(family, d, a.device, a.cuda_dynamic)
         print("== %s: %s" % (tag, " ".join(cmd)), flush=True)
         p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, env=env)
         print("\n".join(line for line in p.stdout.splitlines() if not line.startswith("record: ")))

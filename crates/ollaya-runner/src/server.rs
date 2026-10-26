@@ -173,6 +173,9 @@ fn load_llama(config: &RunnerConfig, gguf: &Path) -> Result<(Box<dyn Engine>, Lo
         model,
         allow_fallback,
         |model| {
+            if let Some(tokenizer) = &config.tokenizer {
+                model.load_tokenizer(tokenizer)?;
+            }
             if let Some(projector) = &config.mmproj {
                 model.load_projector(projector, &libs, config.threads)?;
             }
